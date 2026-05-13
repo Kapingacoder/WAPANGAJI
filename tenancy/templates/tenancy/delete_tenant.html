@@ -1,0 +1,31 @@
+{% extends "landlord/landlord_base.html" %}
+{% load static %}
+
+{% block page_title %}Delete Tenant{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-lg-6 offset-lg-3">
+            <div class="card">
+                <div class="card-header">
+                    <h4 class="card-title">Confirm Deletion</h4>
+                </div>
+                <div class="card-body text-center">
+                    <p>
+                        Are you sure you want to delete the tenancy for <strong>{{ tenancy.tenant.get_full_name|default:tenancy.tenant.username }}</strong> 
+                        at <strong>{{ tenancy.unit.property.name }} (Unit {{ tenancy.unit.unit_number }})</strong>?
+                    </p>
+                    <p class="text-muted">This action cannot be undone.</p>
+                    
+                    <form method="post">
+                        {% csrf_token %}
+                        <a href="{% url 'landlord:dashboard' %}" class="btn btn-secondary">Cancel</a>
+                        <button type="submit" class="btn btn-danger">Confirm Delete</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

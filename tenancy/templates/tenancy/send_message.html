@@ -1,0 +1,364 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Send Message - WAPANGAJI</title>
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'tenancy/style.css' %}">
+    <style>
+        .compose-hero {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 2rem;
+            border-radius: 1.5rem;
+            margin-bottom: 2rem;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .compose-hero::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grain" width="100" height="100" patternUnits="userSpaceOnUse"><circle cx="25" cy="25" r="1" fill="rgba(255,255,255,0.1)"/><circle cx="75" cy="75" r="1" fill="rgba(255,255,255,0.1)"/><circle cx="50" cy="50" r="1" fill="rgba(255,255,255,0.05)"/></pattern></defs><rect width="100" height="100" fill="url(%23grain)"/></svg>');
+            animation: float 20s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translate(0, 0) rotate(0deg); }
+            33% { transform: translate(30px, -30px) rotate(120deg); }
+            66% { transform: translate(-20px, 20px) rotate(240deg); }
+        }
+
+        .compose-hero h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            position: relative;
+            z-index: 1;
+        }
+
+        .compose-hero p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+            position: relative;
+            z-index: 1;
+        }
+
+        .compose-card {
+            background: white;
+            border-radius: 1.25rem;
+            padding: 2.5rem;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            margin-bottom: 2rem;
+        }
+
+        .recipient-preview {
+            background: linear-gradient(135deg, #f0f5ff 0%, #e0e9ff 100%);
+            border: 2px solid #667eea;
+            border-radius: 1rem;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+        }
+
+        .recipient-avatar {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.5rem;
+        }
+
+        .recipient-info h3 {
+            font-size: 1.25rem;
+            color: #1e293b;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+        }
+
+        .recipient-info p {
+            color: #64748b;
+            margin: 0;
+            font-size: 0.95rem;
+        }
+
+        .form-section {
+            background: #f8fafc;
+            border-radius: 1rem;
+            padding: 2rem;
+            border: 1px solid #e2e8f0;
+        }
+
+        .form-group-enhanced {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-label {
+            display: block;
+            font-weight: 600;
+            color: #1e293b;
+            margin-bottom: 0.5rem;
+            font-size: 1rem;
+        }
+
+        .form-input, .form-textarea {
+            width: 100%;
+            padding: 1rem;
+            border: 2px solid #e2e8f0;
+            border-radius: 0.75rem;
+            font-family: 'Poppins', sans-serif;
+            font-size: 1rem;
+            color: #1e293b;
+            transition: all 0.3s ease;
+            background: white;
+        }
+
+        .form-input:focus, .form-textarea:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .form-textarea {
+            resize: vertical;
+            min-height: 150px;
+            line-height: 1.6;
+        }
+
+        .form-actions-enhanced {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            margin-top: 2rem;
+            flex-wrap: wrap;
+        }
+
+        .form-btn {
+            padding: 1rem 2rem;
+            border-radius: 50px;
+            font-weight: 600;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.75rem;
+            transition: all 0.3s ease;
+            font-size: 1rem;
+            border: 2px solid transparent;
+            cursor: pointer;
+        }
+
+        .form-btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .form-btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
+        }
+
+        .form-btn-secondary {
+            background: white;
+            color: #64748b;
+            border-color: #e2e8f0;
+        }
+
+        .form-btn-secondary:hover {
+            background: #f8fafc;
+            border-color: #667eea;
+            color: #667eea;
+            transform: translateY(-2px);
+        }
+
+        .alert {
+            padding: 1rem 1.5rem;
+            border-radius: 0.75rem;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            font-weight: 500;
+        }
+
+        .alert-success {
+            background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%);
+            color: #065f46;
+            border: 1px solid #34d399;
+        }
+
+        .alert-error {
+            background: linear-gradient(135deg, #fee2e2 0%, #fecaca 100%);
+            color: #991b1b;
+            border: 1px solid #f87171;
+        }
+
+        @media (max-width: 768px) {
+            .compose-hero h1 {
+                font-size: 2rem;
+            }
+
+            .recipient-preview {
+                flex-direction: column;
+                text-align: center;
+            }
+
+            .form-actions-enhanced {
+                flex-direction: column;
+            }
+
+            .form-btn {
+                width: 100%;
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="header-container">
+            <div class="logo">
+                <i class="fas fa-user-tie"></i>
+                <span>WAPANGAJI Tenant</span>
+            </div>
+            <nav class="nav">
+                <a href="{% url 'tenancy:tenant_dashboard' %}" class="nav-link">Dashboard</a>
+                <a href="{% url 'tenancy:messages_list' %}" class="nav-link active">Messages</a>
+                <a href="/" class="nav-link">Home</a>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <div class="page-header">
+            <a href="{% url 'tenancy:messages_list' %}" class="back-link">
+                <i class="fas fa-arrow-left"></i> Back to Messages
+            </a>
+        </div>
+
+        <!-- Hero Section -->
+        <div class="compose-hero">
+            <h1><i class="fas fa-paper-plane"></i> Compose Message</h1>
+            <p>Send a message to your landlord</p>
+        </div>
+
+        <div class="compose-card">
+            <form method="POST" class="message-form">
+                {% csrf_token %}
+
+                <!-- Success Message -->
+                {% if messages %}
+                    <div class="alert alert-success">
+                        {% for message in messages %}
+                            <i class="fas fa-check-circle"></i>
+                            {{ message }}
+                        {% endfor %}
+                    </div>
+                {% endif %}
+
+                <!-- Recipient Preview -->
+                {% if tenancy %}
+                    <div class="recipient-preview">
+                        <div class="recipient-avatar">
+                            <i class="fas fa-user"></i>
+                        </div>
+                        <div class="recipient-info">
+                            <h3>Send to: {{ tenancy.unit.property.landlord.first_name }} {{ tenancy.unit.property.landlord.last_name }}</h3>
+                            <p>{{ tenancy.unit.property.landlord.email }}</p>
+                        </div>
+                    </div>
+                {% else %}
+                    <div class="alert alert-error">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        No active tenancy found. You cannot send messages without an active tenancy.
+                    </div>
+                {% endif %}
+
+                <!-- Form Fields -->
+                <div class="form-section">
+                    <div class="form-group-enhanced">
+                        <label for="subject" class="form-label">
+                            <i class="fas fa-heading"></i> Subject *
+                        </label>
+                        <input
+                            type="text"
+                            id="subject"
+                            name="subject"
+                            class="form-input"
+                            placeholder="What is this message about?"
+                            maxlength="200"
+                            required
+                        >
+                    </div>
+
+                    <div class="form-group-enhanced">
+                        <label for="body" class="form-label">
+                            <i class="fas fa-message"></i> Message *
+                        </label>
+                        <textarea
+                            id="body"
+                            name="body"
+                            class="form-textarea"
+                            placeholder="Type your message here..."
+                            rows="8"
+                            required
+                        ></textarea>
+                    </div>
+
+                    <!-- Form Actions -->
+                    <div class="form-actions-enhanced">
+                        <button type="submit" class="form-btn form-btn-primary">
+                            <i class="fas fa-paper-plane"></i> Send Message
+                        </button>
+                        <a href="{% url 'tenancy:messages_list' %}" class="form-btn form-btn-secondary">
+                            <i class="fas fa-times"></i> Cancel
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Help Section -->
+                <div class="help-section">
+                    <h4><i class="fas fa-lightbulb"></i> Tips for Better Communication:</h4>
+                    <ul>
+                        <li>Be specific about your issue or request</li>
+                        <li>Include relevant details (unit number, date, etc.)</li>
+                        <li>Keep your tone professional and polite</li>
+                        <li>Provide a clear subject line</li>
+                        <li>Expect a response within 24-48 hours</li>
+                    </ul>
+                </div>
+            </form>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <p>&copy; 2025 WAPANGAJI. All Rights Reserved.</p>
+    </footer>
+
+    <script>
+        // Character counter for subject
+        const subjectInput = document.getElementById('subject');
+        subjectInput.addEventListener('input', function() {
+            const remaining = 200 - this.value.length;
+            // You can add visual feedback here if needed
+        });
+    </script>
+</body>
+</html>

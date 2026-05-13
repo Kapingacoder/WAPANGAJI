@@ -1,0 +1,338 @@
+{% extends 'landlord/landlord_base.html' %}
+
+{% block title %}Add Property{% endblock %}
+
+{% block sidebar %}{% endblock %}
+
+{% block sidebar_styles %}
+.main-content {
+    margin-left: 0;
+    padding: 2rem;
+}
+.header {
+    margin-left: 0;
+}
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- Page Header -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h1 class="h3 mb-0 text-gray-800">
+                <i class="fas fa-plus-circle me-2 text-primary"></i>Add New Property
+            </h1>
+            <p class="text-muted mb-0">Fill in the details to add a new property to your portfolio</p>
+        </div>
+        <div class="d-flex gap-2">
+            <a href="{% url 'properties:properties_list' %}" class="btn btn-outline-secondary">
+                <i class="fas fa-arrow-left me-1"></i>Back to Properties
+            </a>
+        </div>
+    </div>
+
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                <i class="fas {% if message.tags == 'success' %}fa-check-circle{% else %}fa-exclamation-circle{% endif %} me-2"></i>
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        {% endfor %}
+    {% endif %}
+
+    <!-- Add Property Form -->
+    <div class="card shadow mb-4">
+        <div class="card-body">
+            <form method="POST" class="needs-validation" novalidate>
+                {% csrf_token %}
+                
+                <div class="row mb-4">
+                    <div class="col-12">
+                        <h5 class="text-primary mb-0"><i class="fas fa-info-circle me-2"></i>Property Information</h5>
+                        <p class="text-muted">Basic details about the property</p>
+                    </div>
+                </div>
+
+                <div class="row g-3">
+                    <!-- Property Name -->
+                    <div class="col-md-6">
+                        <label for="name" class="form-label">Property Name <span class="text-danger">*</span></label>
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="fas fa-home"></i></span>
+                            <input type="text" 
+                                   class="form-control" 
+                                   id="name" 
+                                   name="name" 
+                                   placeholder="e.g. Green Valley Apartments" 
+                                   required>
+                        </div>
+                        <div class="form-text">The name that will identify this property</div>
+                    </div>
+
+                    <!-- Rent Amount Field -->
+                    <div class="col-md-6">
+                        <label for="rent" class="form-label">
+                            <i class="fas fa-money-bill-wave"></i> Monthly Rent ($) *
+                        </label>
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="fas fa-dollar-sign"></i></span>
+                            <input type="number" 
+                                   class="form-control" 
+                                   id="rent" 
+                                   name="rent" 
+                                   step="0.01"
+                                   placeholder="e.g., 1200"
+                                   required>
+                        </div>
+                        <div class="form-text">Enter the monthly rent amount</div>
+                    </div>
+
+                    <!-- Number of Rooms Field -->
+                    <div class="col-md-6">
+                        <label for="rooms" class="form-label">
+                            <i class="fas fa-door-open"></i> Number of Rooms *
+                        </label>
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="fas fa-door-open"></i></span>
+                            <input type="number" 
+                                   class="form-control" 
+                                   id="rooms" 
+                                   name="rooms" 
+                                   min="1"
+                                   placeholder="e.g., 3"
+                                   required>
+                        </div>
+                        <div class="form-text">How many rooms does the property have?</div>
+                    </div>
+
+                    <!-- Property Status Field -->
+                    <div class="col-md-6">
+                        <label for="status" class="form-label">
+                            <i class="fas fa-info-circle"></i> Property Status *
+                        </label>
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="fas fa-info-circle"></i></span>
+                            <select id="status" name="status" class="form-select" required>
+                                <option value="">-- Select Status --</option>
+                                <option value="vacant">Vacant</option>
+                                <option value="occupied">Occupied</option>
+                                <option value="pending">Pending Inspection</option>
+                                <option value="maintenance">Under Maintenance</option>
+                            </select>
+                        </div>
+                        <div class="form-text">Current status of the property</div>
+                    </div>
+
+                    <!-- Property Type -->
+                    <div class="col-md-6">
+                        <label for="property_type" class="form-label">Property Type <span class="text-danger">*</span></label>
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="fas fa-building"></i></span>
+                            <select class="form-select" id="property_type" name="property_type" required>
+                                <option value="" disabled selected>Select property type</option>
+                                <option value="apartment">Apartment Building</option>
+                                <option value="house">House</option>
+                                <option value="townhouse">Townhouse</option>
+                                <option value="commercial">Commercial</option>
+                                <option value="other">Other</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Location Field -->
+                    <div class="col-md-6">
+                        <label for="location" class="form-label">
+                            <i class="fas fa-map-marker-alt"></i> Location *
+                        </label>
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="fas fa-map-marker-alt"></i></span>
+                            <input type="text" 
+                                   class="form-control" 
+                                   id="location" 
+                                   name="location" 
+                                   placeholder="e.g., Block A, Street 12"
+                                   required>
+                        </div>
+                        <div class="form-text">Area or district name</div>
+                    </div>
+
+                    <!-- Utilities Field -->
+                    <div class="col-md-6">
+                        <label for="utilities" class="form-label">
+                            <i class="fas fa-plug"></i> Utilities Included
+                        </label>
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="fas fa-plug"></i></span>
+                            <input type="text" 
+                                   class="form-control" 
+                                   id="utilities" 
+                                   name="utilities" 
+                                   placeholder="e.g., Water, Electricity, Wi-Fi">
+                        </div>
+                        <div class="form-text">List any utilities included (optional)</div>
+                    </div>
+
+                    <!-- Address -->
+                    <div class="col-12">
+                        <label for="address" class="form-label">Full Address <span class="text-danger">*</span></label>
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="fas fa-map-marker-alt"></i></span>
+                            <textarea class="form-control" 
+                                     id="address" 
+                                     name="address" 
+                                     rows="2" 
+                                     placeholder="Full street address" 
+                                     required></textarea>
+                        </div>
+                    </div>
+
+                    <!-- Description Field (Full Width) -->
+                    <div class="col-12">
+                        <label for="description" class="form-label">
+                            <i class="fas fa-file-alt"></i> Description
+                        </label>
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="fas fa-file-alt"></i></span>
+                            <textarea class="form-control" 
+                                     id="description" 
+                                     name="description" 
+                                     rows="4" 
+                                     placeholder="Describe your property, features, amenities, etc."></textarea>
+                        </div>
+                        <div class="form-text">Additional details about the property (optional)</div>
+                    </div>
+                </div>
+
+                <!-- Units Section -->
+                <hr class="my-4">
+                <div class="row mb-4">
+                    <div class="col-12">
+                        <h5 class="text-primary mb-0"><i class="fas fa-cubes me-2"></i>Units</h5>
+                        <p class="text-muted">Add the units available in this property</p>
+                    </div>
+                </div>
+
+                <div id="units-container" class="mb-3">
+                    <!-- Units will be added here dynamically -->
+                </div>
+
+                <div class="d-grid gap-2 d-md-flex justify-content-md-start mb-4">
+                    <button type="button" id="add-unit-btn" class="btn btn-outline-primary">
+                        <i class="fas fa-plus me-1"></i>Add Unit
+                    </button>
+                </div>
+
+                <!-- Form Actions -->
+                <div class="d-flex justify-content-between mt-4">
+                    <a href="{% url 'properties:properties_list' %}" class="btn btn-outline-secondary">
+                        <i class="fas fa-times me-1"></i>Cancel
+                    </a>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-save me-1"></i>Save Property
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+{% block extra_js %}
+<script>
+    // Function to add a new unit row
+    function addUnit(unitNumber = '', rent = '', status = 'vacant') {
+        const container = document.getElementById('units-container');
+        const unitId = Date.now(); // Unique ID for each unit
+        
+        const unitHtml = `
+            <div class="card mb-2" id="unit-${unitId}">
+                <div class="card-body">
+                    <div class="row g-3">
+                        <div class="col-md-4">
+                            <label class="form-label">Unit Number <span class="text-danger">*</span></label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="fas fa-hashtag"></i></span>
+                                <input type="text" 
+                                       name="unit_number[]" 
+                                       class="form-control" 
+                                       placeholder="e.g. 101" 
+                                       value="${unitNumber}" 
+                                       required>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">Monthly Rent <span class="text-danger">*</span></label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="fas fa-dollar-sign"></i></span>
+                                <input type="number" 
+                                       name="unit_rent[]" 
+                                       class="form-control" 
+                                       placeholder="0.00" 
+                                       min="0" 
+                                       step="0.01" 
+                                       value="${rent}" 
+                                       required>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label">Status</label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="fas fa-info-circle"></i></span>
+                                <select name="unit_status[]" class="form-select">
+                                    <option value="vacant" ${status === 'vacant' ? 'selected' : ''}>Vacant</option>
+                                    <option value="occupied" ${status === 'occupied' ? 'selected' : ''}>Occupied</option>
+                                    <option value="maintenance" ${status === 'maintenance' ? 'selected' : ''}>Maintenance</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-1 d-flex align-items-end">
+                            <button type="button" class="btn btn-outline-danger w-100" onclick="removeUnit(${unitId})">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+        
+        container.insertAdjacentHTML('beforeend', unitHtml);
+    }
+    
+    // Function to remove a unit row
+    function removeUnit(unitId) {
+        const unitElement = document.getElementById(`unit-${unitId}`);
+        if (unitElement) {
+            unitElement.remove();
+        }
+        
+        // If no units left, add one back
+        if (document.querySelectorAll('.unit-row').length === 0) {
+            addUnit();
+        }
+    }
+
+    // Add unit button event
+    document.addEventListener('DOMContentLoaded', function() {
+        document.getElementById('add-unit-btn').addEventListener('click', function() {
+            addUnit();
+        });
+        
+        // Add first unit by default
+        addUnit();
+        
+        // Enable Bootstrap form validation
+        const forms = document.querySelectorAll('.needs-validation');
+        Array.from(forms).forEach(form => {
+            form.addEventListener('submit', event => {
+                if (!form.checkValidity()) {
+                    event.preventDefault();
+                    event.stopPropagation();
+                }
+                form.classList.add('was-validated');
+            }, false);
+        });
+    });
+</script>
+{% endblock %}
+
+{% endblock %}

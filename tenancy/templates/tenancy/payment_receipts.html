@@ -1,0 +1,511 @@
+{% extends 'tenancy/tenant_base.html' %}
+{% load humanize %}
+
+{% block title %}Payment Receipts - {{ user.get_full_name|default:user.username }}{% endblock %}
+
+
+{% block content %}
+<div class="tenant-app-page">
+  <div class="container-fluid">
+    <div class="tenant-app-header mb-3">
+      <div class="logo">W</div>
+      <div class="title">Payment Receipts — Tenant Portal</div>
+      <div style="margin-left:auto"><a class="tenant-app-outline" href="{% url 'tenancy:payment_history' %}">Back to Payments</a></div>
+    </div>
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h1><i class="fas fa-receipt me-2"></i>Payment Receipts</h1>
+            <p class="text-muted mb-0">View and manage your payment history</p>
+        </div>
+        <a href="{% url 'tenancy:payment_history' %}" class="btn btn-outline-secondary">
+            <i class="fas fa-arrow-left me-1"></i> Back to Payments
+        </a>
+    </div>
+
+    {% if not tenancy %}
+        <div class="alert alert-warning" role="alert">
+            <i class="fas fa-exclamation-circle me-2"></i>
+            You don't have an active tenancy. No payment history to display.
+        </div>
+    {% else %}
+        <!-- Property Info -->
+        <div class="card shadow mb-4">
+            <div class="card-body">
+                <div class="d-flex align-items-center">
+                    <div class="me-4">
+                        <i class="fas fa-building fa-2x text-primary"></i>
+                    </div>
+                    <div>
+                        <h5 class="mb-1">{{ property.name }}</h5>
+                        <p class="text-muted mb-1">
+                            <i class="fas fa-map-marker-alt me-1"></i> {{ unit.unit_number }} • {{ property.address }}
+                        </p>
+                        <p class="mb-0">
+                            <strong>Total Paid:</strong> TZS {{ total_paid|floatformat:2|intcomma }}
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Summary Cards -->
+        <div class="row mb-4">
+            <div class="col-md-4 mb-3">
+                <div class="card h-100 border-0 shadow-sm">
+                    <div class="card-body text-center">
+                        <div class="text-primary mb-2">
+                            <i class="fas fa-file-invoice-dollar fa-2x"></i>
+                        </div>
+                        <h6 class="text-muted mb-1">Total Receipts</h6>
+                        <h4 class="mb-0">{{ payments|length }}</h4>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-4 mb-3">
+                <div class="card h-100 border-0 shadow-sm">
+                    <div class="card-body text-center">
+                        <div class="text-success mb-2">
+                            <i class="fas fa-money-bill-wave fa-2x"></i>
+                        </div>
+                        <h6 class="text-muted mb-1">Total Paid</h6>
+                        <h4 class="mb-0">TZS {{ total_paid|floatformat:2|intcomma }}</h4>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-4 mb-3">
+                <div class="card h-100 border-0 shadow-sm">
+                    <div class="card-body text-center">
+                        <div class="text-info mb-2">
+                            <i class="fas fa-calendar-check fa-2x"></i>
+                        </div>
+                        <h6 class="text-muted mb-1">Last Payment</h6>
+                        <h5 class="mb-0">
+                            {% with payments|first as last_payment %}
+                                {{ last_payment.date|date:"M d, Y"|default:"N/A" }}
+                            {% endwith %}
+                        </h5>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Property and Unit Info -->
+        <div class="card shadow mb-4">
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <h5 class="font-weight-bold text-primary mb-3">
+                            <i class="fas fa-home me-2"></i>Property Information
+                        </h5>
+                        <div class="mb-2">
+                            <span class="text-muted">Property:</span>
+                            <span class="font-weight-bold">{{ property.name }}</span>
+                        </div>
+                        <div class="mb-2">
+                            <span class="text-muted">Address:</span>
+                            <span class="font-weight-bold">{{ property.address }}</span>
+                        </div>
+                        <div class="mb-2">
+                            <span class="text-muted">Unit:</span>
+                            <span class="font-weight-bold">{{ unit.unit_number }} - {{ unit.get_unit_type_display }}</span>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <h5 class="font-weight-bold text-primary mb-3">
+                            <i class="fas fa-user me-2"></i>Tenant Information
+                        </h5>
+                        <div class="mb-2">
+                            <span class="text-muted">Name:</span>
+                            <span class="font-weight-bold">{{ user.get_full_name|default:user.username }}</span>
+                        </div>
+                        <div class="mb-2">
+                            <span class="text-muted">Email:</span>
+                            <span class="font-weight-bold">{{ user.email }}</span>
+                        </div>
+                        <div class="mb-2">
+                            <span class="text-muted">Lease Period:</span>
+                            <span class="font-weight-bold">
+                                {{ tenancy.start_date|date:"M d, Y" }} - {{ tenancy.end_date|date:"M d, Y" }}
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        <!-- Receipts List -->
+        <div class="card shadow mb-4">
+            <div class="card-header py-3">
+                <h6 class="m-0 font-weight-bold text-primary">
+                    <i class="fas fa-receipt me-2"></i>Payment Receipts
+                </h6>
+            </div>
+            <div class="card-body p-0">
+                {% if payments %}
+                    <div class="list-group list-group-flush">
+                        {% for payment in payments %}
+                        <div class="list-group-item border-0 py-3 px-4 {% if not forloop.last %}border-bottom{% endif %}">
+                            <div class="d-flex justify-content-between align-items-start">
+                                <div class="d-flex">
+                                    <div class="me-3 text-center" style="min-width: 60px;">
+                                        <div class="bg-light rounded p-2 text-primary">
+                                            <div class="fw-bold">{{ payment.date|date:"M" }}</div>
+                                            <div class="h5 mb-0 fw-bold">{{ payment.date|date:"d" }}</div>
+                                            <div class="small">{{ payment.date|date:"Y" }}</div>
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <h6 class="mb-1">
+                                            {{ payment.get_payment_type_display }}
+                                            <span class="badge ms-2 bg-{% if payment.status|lower == 'paid' %}success{% else %}info{% endif %}">
+                                                {{ payment.get_status_display }}
+                                            </span>
+                                        </h6>
+                                        <p class="text-muted mb-1">
+                                            <i class="fas fa-hashtag me-1"></i> {{ payment.receipt_number|default:'N/A' }}
+                                            <span class="mx-2">•</span>
+                                            <i class="fas fa-{{ payment.payment_method|lower|default:'money-bill' }} me-1"></i>
+                                            {{ payment.get_payment_method_display }}
+                                        </p>
+                                        <div class="d-flex align-items-center">
+                                            <span class="badge bg-light text-dark fs-6 fw-bold me-2">
+                                                TZS {{ payment.amount|floatformat:2|intcomma }}
+                                            </span>
+                                            {% if payment.notes %}
+                                                <small class="text-muted">
+                                                    <i class="fas fa-sticky-note me-1"></i>
+                                                    {{ payment.notes|truncatechars:30 }}
+                                                </small>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="dropdown">
+                                    <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button" id="dropdownMenuButton{{ forloop.counter }}" data-bs-toggle="dropdown" aria-expanded="false">
+                                        <i class="fas fa-ellipsis-v"></i>
+                                    </button>
+                                    <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="dropdownMenuButton{{ forloop.counter }}">
+                                        <li>
+                                            <a class="dropdown-item print-receipt" href="#" data-receipt-id="{{ payment.id }}">
+                                                <i class="fas fa-print me-2"></i>Print Receipt
+                                            </a>
+                                        </li>
+                                        <li>
+                                            <a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#receiptModal{{ payment.id }}">
+                                                <i class="fas fa-eye me-2"></i>View Details
+                                            </a>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <div class="text-center py-5">
+                        <i class="fas fa-file-invoice fa-3x text-muted mb-3"></i>
+                        <h5 class="text-muted">No payment receipts found</h5>
+                        <p class="text-muted">Your payment history will appear here</p>
+                        <a href="{% url 'tenancy:payment_history' %}" class="btn btn-primary mt-2">
+                            <i class="fas fa-plus me-1"></i> Make a Payment
+                        </a>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    {% endif %}
+</div>
+
+<!-- Receipt Modals -->
+{% for payment in payments %}
+<div class="modal fade" id="receiptModal{{ payment.id }}" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Payment Receipt #{{ payment.receipt_number|default:payment.id }}</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body" id="receiptContent{{ payment.id }}">
+                <div class="text-center mb-4">
+                    <h4 class="text-primary">{{ property.name }}</h4>
+                    <p class="text-muted mb-0">{{ property.address }}</p>
+                    <p class="text-muted">Receipt #{{ payment.receipt_number|default:payment.id }}</p>
+                </div>
+                
+                <div class="row mb-4">
+                    <div class="col-md-6">
+                        <h6 class="text-muted">Paid By</h6>
+                        <p class="mb-1">{{ user.get_full_name|default:user.username }}</p>
+                        <p class="text-muted mb-0">{{ user.email }}</p>
+                        <p class="text-muted">{{ payment.tenancy.unit.unit_number }} - {{ payment.tenancy.unit.get_unit_type_display }}</p>
+                    </div>
+                    <div class="col-md-6 text-md-end">
+                        <h6 class="text-muted">Payment Details</h6>
+                        <p class="mb-1">Date: {{ payment.date|date:"F d, Y" }}</p>
+                        <p class="mb-1">Time: {{ payment.date|time:"H:i" }}</p>
+                        <p class="mb-0">Status: 
+                            <span class="badge bg-{% if payment.status|lower == 'paid' %}success{% else %}info{% endif %}">
+                                {{ payment.get_status_display }}
+                            </span>
+                        </p>
+                    </div>
+                </div>
+                
+                <div class="table-responsive">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Description</th>
+                                <th class="text-end">Amount</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>{{ payment.get_payment_type_display }}</td>
+                                <td class="text-end">TZS {{ payment.amount|floatformat:2|intcomma }}</td>
+                            </tr>
+                            <tr>
+                                <td class="border-0"><strong>Payment Method</strong></td>
+                                <td class="text-end border-0">{{ payment.get_payment_method_display }}</td>
+                            </tr>
+                            <tr class="table-active">
+                                <td><strong>Total</strong></td>
+                                <td class="text-end"><strong>TZS {{ payment.amount|floatformat:2|intcomma }}</strong></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                
+                {% if payment.notes %}
+                <div class="alert alert-light mt-3">
+                    <h6 class="alert-heading">Notes</h6>
+                    <p class="mb-0">{{ payment.notes }}</p>
+                </div>
+                {% endif %}
+                
+                <div class="text-muted small mt-4">
+                    <p class="mb-1">Thank you for your payment!</p>
+                    <p class="mb-0">This is an automated receipt. No signature required.</p>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary print-receipt" data-receipt-id="{{ payment.id }}">
+                    <i class="fas fa-print me-1"></i> Print Receipt
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endfor %}
+
+<!-- Print Modal -->
+<div class="modal fade" id="printModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Payment Receipt</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body" id="receiptContent">
+                <!-- Receipt content will be loaded here via AJAX -->
+                <div class="text-center py-5">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                    <p class="mt-2">Loading receipt...</p>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" onclick="window.print()">
+                    <i class="fas fa-print me-1"></i>Print Receipt
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+  </div>
+</div>
+
+<style>
+/* Payment Receipts List */
+.list-group-item {
+    transition: all 0.2s ease;
+}
+
+.list-group-item:hover {
+    background-color: #f8f9fa;
+}
+
+/* Status Badges */
+.badge {
+    font-weight: 500;
+    padding: 0.35em 0.65em;
+    font-size: 0.75em;
+}
+
+/* Amount Badge */
+.badge.bg-light {
+    color: #0d6efd !important;
+    border: 1px solid #dee2e6;
+}
+
+/* Card Hover Effect */
+.card {
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    border: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+.card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.05) !important;
+}
+
+/* Receipt Modal */
+.modal-header {
+    background-color: #f8f9fa;
+    border-bottom: 1px solid #e9ecef;
+}
+
+.modal-footer {
+    background-color: #f8f9fa;
+    border-top: 1px solid #e9ecef;
+}
+
+/* Print Styles */
+@media print {
+    .no-print, .modal-footer {
+        display: none !important;
+    }
+    
+    .modal-dialog {
+        max-width: 100%;
+        margin: 0;
+    }
+    
+    .modal-content {
+        border: none;
+        box-shadow: none;
+    }
+    
+    body {
+        padding: 0;
+        margin: 0;
+    }
+}
+
+/* Responsive Adjustments */
+@media (max-width: 768px) {
+    .card-body {
+        padding: 1rem;
+    }
+    
+    .list-group-item {
+        padding: 1rem 0.75rem;
+    }
+    
+    .dropdown-menu {
+        position: absolute !important;
+        right: 0;
+        left: auto;
+    }
+    
+    .btn {
+        padding: 0.25rem 0.5rem;
+        font-size: 0.875rem;
+    }
+}
+
+/* Animation for receipt items */
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.list-group-item {
+    animation: fadeIn 0.3s ease-out forwards;
+    opacity: 0;
+}
+
+/* Delay each item's animation */
+.list-group-item:nth-child(1) { animation-delay: 0.1s; }
+.list-group-item:nth-child(2) { animation-delay: 0.2s; }
+.list-group-item:nth-child(3) { animation-delay: 0.3s; }
+.list-group-item:nth-child(4) { animation-delay: 0.4s; }
+.list-group-item:nth-child(5) { animation-delay: 0.5s; }
+</style>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+$(document).ready(function() {
+    // Handle print receipt button click
+    $('.print-receipt').click(function(e) {
+        e.preventDefault();
+        var receiptId = $(this).data('receipt-id');
+        
+        // Get the receipt content
+        var printContents = document.getElementById('receiptContent' + receiptId).innerHTML;
+        var originalContents = document.body.innerHTML;
+        
+        // Create a new window for printing
+        var printWindow = window.open('', '_blank');
+        
+        // Write the receipt content to the new window
+        printWindow.document.write(`
+            <!DOCTYPE html>
+            <html>
+            <head>
+                <title>Receipt #${receiptId}</title>
+                <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+                <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+                <style>
+                    @media print {
+                        @page { margin: 0; }
+                        body { padding: 1cm; }
+                        .no-print { display: none !important; }
+                    }
+                    body { font-family: Arial, sans-serif; }
+                    .receipt-header { text-align: center; margin-bottom: 20px; }
+                    .receipt-details { margin: 20px 0; }
+                    .receipt-table { width: 100%; margin: 20px 0; }
+                    .receipt-table th { border-bottom: 2px solid #dee2e6; }
+                    .receipt-table td { padding: 8px 0; }
+                    .receipt-total { font-weight: bold; font-size: 1.1em; }
+                    .receipt-footer { margin-top: 40px; text-align: center; font-size: 0.9em; color: #6c757d; }
+                </style>
+            </head>
+            <body>
+                ${printContents}
+                <div class="text-center mt-4 no-print">
+                    <button class="btn btn-primary" onclick="window.print()">
+                        <i class="fas fa-print me-2"></i>Print Receipt
+                    </button>
+                    <button class="btn btn-outline-secondary ms-2" onclick="window.close()">
+                        <i class="fas fa-times me-2"></i>Close
+                    </button>
+                </div>
+                <script>
+                    // Auto-print when the window loads
+                    window.onload = function() {
+                        setTimeout(function() {
+                            window.print();
+                        }, 500);
+                    };
+                <\/script>
+            </body>
+            </html>
+        `);
+        
+        printWindow.document.close();
+    });
+    
+    // Initialize tooltips
+    var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+    var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+        return new bootstrap.Tooltip(tooltipTriggerEl);
+    });
+});
+</script>
+{% endblock %}

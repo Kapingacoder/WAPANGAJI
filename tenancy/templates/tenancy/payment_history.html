@@ -1,0 +1,1510 @@
+{% extends 'tenancy/tenant_base.html' %}
+{% load static %}
+
+{% block title %}Payment History - WAPANGAJI{% endblock %}
+
+
+{% block content %}
+<div class="tenant-app-page">
+  <div class="container-fluid">
+    <div class="tenant-app-header mb-3">
+      <div class="logo">W</div>
+      <div class="title">Payments & Receipts — Tenant Portal</div>
+      <div style="margin-left:auto"><a class="tenant-app-btn" href="{% url 'tenancy:add_payment' tenancy.id %}">Make Payment</a></div>
+    </div>
+    <!-- Header Section -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h1><i class="fas fa-history me-2"></i>Payment History</h1>
+            <p class="text-muted mb-0">Track all payment activities and transactions</p>
+        </div>
+        <a href="#" class="btn btn-outline-primary" id="exportPayments">
+            <i class="fas fa-download me-1"></i>Export
+        </a>
+    </div>
+
+    <!-- Summary Cards -->
+    <div class="row mb-4">
+        <div class="col-md-3">
+            <div class="card border-left-primary shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
+                                Total Paid
+                            </div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800" id="total-paid">TZS 0</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-money-bill-wave fa-2x text-primary"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="card border-left-success shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-success text-uppercase mb-1">
+                                Completed Payments
+                            </div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800" id="completed-payments">0</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-check-circle fa-2x text-success"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="card border-left-warning shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">
+                                Pending Payments
+                            </div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800" id="pending-payments">0</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-clock fa-2x text-warning"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="card border-left-info shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-info text-uppercase mb-1">
+                                Total Transactions
+                            </div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800" id="total-transactions">0</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-exchange-alt fa-2x text-info"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Filter Section -->
+    <div class="card shadow mb-4">
+        <div class="card-header py-3 d-flex justify-content-between align-items-center">
+            <h6 class="m-0 font-weight-bold text-primary">
+                <i class="fas fa-filter me-1"></i>Filter Payments
+            </h6>
+            <button class="btn btn-sm btn-link" type="button" data-bs-toggle="collapse" data-bs-target="#filterCollapse" 
+                    aria-expanded="true" aria-controls="filterCollapse">
+                <i class="fas fa-chevron-down"></i>
+            </button>
+        </div>
+        <div class="collapse show" id="filterCollapse">
+            <div class="card-body">
+                <div class="row g-3">
+                    <div class="col-md-3">
+                        <label class="form-label">Date Range</label>
+                        <select class="form-select" id="dateRange">
+                            <option value="all">All Time</option>
+                            <option value="today">Today</option>
+                            <option value="week">This Week</option>
+                            <option value="month">This Month</option>
+                            <option value="year">This Year</option>
+                            <option value="custom">Custom Range</option>
+                        </select>
+                    </div>
+                    <div class="col-md-3" id="startDateContainer" style="display: none;">
+                        <label class="form-label">Start Date</label>
+                        <input type="date" class="form-control" id="startDate">
+                    </div>
+                    <div class="col-md-3" id="endDateContainer" style="display: none;">
+                        <label class="form-label">End Date</label>
+                        <input type="date" class="form-control" id="endDate">
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label">Status</label>
+                        <select class="form-select" id="statusFilter">
+                            <option value="">All Status</option>
+                            <option value="Paid">Paid</option>
+                            <option value="Pending">Pending</option>
+                            <option value="Late">Late</option>
+                            <option value="Failed">Failed</option>
+                        </select>
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label">Payment Method</label>
+                        <select class="form-select" id="methodFilter">
+                            <option value="">All Methods</option>
+                            <option value="M-Pesa">M-Pesa</option>
+                            <option value="Bank Transfer">Bank Transfer</option>
+                            <option value="Cash">Cash</option>
+                            <option value="Cheque">Cheque</option>
+                        </select>
+                    </div>
+                    <div class="col-12 mt-3">
+                        <button class="btn btn-primary me-2" id="applyFilters">
+                            <i class="fas fa-filter me-1"></i>Apply Filters
+                        </button>
+                        <button class="btn btn-outline-secondary" id="resetFilters">
+                            <i class="fas fa-undo me-1"></i>Reset
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Payments List -->
+    <div class="card shadow mb-4">
+        <div class="card-header py-3 d-flex justify-content-between align-items-center">
+            <h6 class="m-0 font-weight-bold text-primary">
+                <i class="fas fa-list me-1"></i>Payment History
+            </h6>
+            <div class="dropdown">
+                <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button" id="sortDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                    <i class="fas fa-sort me-1"></i>Sort By
+                </button>
+                <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="sortDropdown">
+                    <li><a class="dropdown-item" href="#" data-sort="date-desc">Date (Newest First)</a></li>
+                    <li><a class="dropdown-item" href="#" data-sort="date-asc">Date (Oldest First)</a></li>
+                    <li><a class="dropdown-item" href="#" data-sort="amount-desc">Amount (High to Low)</a></li>
+                    <li><a class="dropdown-item" href="#" data-sort="amount-asc">Amount (Low to High)</a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-hover" id="paymentsTable">
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>Tenant</th>
+                            <th>Property</th>
+                            <th>Amount</th>
+                            <th>Status</th>
+                            <th>Method</th>
+                            <th>Reference</th>
+                            <th class="text-end">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="paymentsTableBody">
+                        {% if payments %}
+                            {% for payment in payments %}
+                            <tr>
+                                <td>{{ payment.date|date:"M d, Y" }}</td>
+                                <td>{{ tenancy.tenant.get_full_name|default:tenancy.tenant.username }}</td>
+                                <td>{{ property.name }} - {{ unit.unit_number }}</td>
+                                <td>TZS {{ payment.amount|floatformat:2 }}</td>
+                                <td>
+                                    <span class="badge {% if payment.status == 'Paid' %}bg-success{% elif payment.status == 'Pending' %}bg-warning{% elif payment.status == 'Late' %}bg-danger{% else %}bg-secondary{% endif %}">
+                                        {{ payment.status }}
+                                    </span>
+                                </td>
+                                <td>{{ payment.method }}</td>
+                                <td>{{ payment.reference_number|default:"N/A" }}</td>
+                                <td class="text-end">
+                                    <a href="{% url 'tenancy:payment_details' payment.id %}" class="btn btn-sm btn-outline-primary">
+                                        <i class="fas fa-eye"></i> View
+                                    </a>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        {% else %}
+                            <tr>
+                                <td colspan="8" class="text-center py-4">
+                                    <i class="fas fa-inbox fa-3x text-muted mb-3"></i>
+                                    <p class="mb-0">No payment records found</p>
+                                </td>
+                            </tr>
+                        {% endif %}
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            
+            <!-- Pagination -->
+            <nav aria-label="Page navigation" class="mt-4">
+                <ul class="pagination justify-content-center" id="pagination">
+                    <!-- Pagination will be added by JavaScript -->
+                </ul>
+            </nav>
+        </div>
+    </div>
+</div>
+</div>
+
+<!-- Payment Details Modal -->
+<div class="modal fade" id="paymentDetailsModal" tabindex="-1" aria-labelledby="paymentDetailsModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="paymentDetailsModalLabel">Payment Details</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body" id="paymentDetailsContent">
+                <!-- Payment details will be loaded here -->
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" id="printReceipt">
+                    <i class="fas fa-print me-1"></i>Print Receipt
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    /* Custom styles to match notifications page */
+    .card {
+        border: none;
+        border-radius: 0.5rem;
+        margin-bottom: 1.5rem;
+        box-shadow: 0 0.15rem 1.75rem 0 rgba(58, 59, 69, 0.1);
+    }
+    
+    .card-header {
+        background-color: #f8f9fc;
+        border-bottom: 1px solid #e3e6f0;
+        padding: 1rem 1.35rem;
+    }
+    
+    .card-title {
+        color: #4e73df;
+        font-weight: 700;
+    }
+    
+    .table {
+        margin-bottom: 0;
+    }
+    
+    .table th {
+        border-top: none;
+        font-weight: 600;
+        text-transform: uppercase;
+        font-size: 0.7rem;
+        letter-spacing: 0.5px;
+        color: #4e73df;
+        padding: 1rem;
+    }
+    
+    .table td {
+        padding: 1rem;
+        vertical-align: middle;
+        border-color: #eaecf4;
+    }
+    
+    .badge {
+        font-weight: 600;
+        padding: 0.4em 0.8em;
+        font-size: 0.75rem;
+    }
+    
+    .badge-success {
+        background-color: #1cc88a;
+    }
+    
+    .badge-warning {
+        background-color: #f6c23e;
+    }
+    
+    .badge-danger {
+        background-color: #e74a3b;
+    }
+    
+    .badge-info {
+        background-color: #36b9cc;
+    }
+    
+    .btn-sm {
+        padding: 0.25rem 0.5rem;
+        font-size: 0.75rem;
+    }
+    
+    /* Responsive styles */
+    @media (max-width: 768px) {
+        .table-responsive {
+            border: none;
+        }
+        
+        .table thead {
+            display: none;
+        }
+        
+        .table, .table tbody, .table tr, .table td {
+            display: block;
+            width: 100%;
+        }
+        
+        .table tr {
+            margin-bottom: 1.5rem;
+            border: 1px solid #e3e6f0;
+            border-radius: 0.35rem;
+            overflow: hidden;
+        }
+        
+        .table td {
+            text-align: right;
+            padding-left: 50%;
+            position: relative;
+            border-bottom: 1px solid #e3e6f0;
+        }
+        
+        .table td:before {
+            content: attr(data-label);
+            position: absolute;
+            left: 1rem;
+            width: 45%;
+            text-align: left;
+            font-weight: 600;
+            color: #4e73df;
+        }
+        
+        .table td:last-child {
+            border-bottom: none;
+        }
+    }
+</style>
+
+<script>
+    // Update stats with real data
+    document.addEventListener('DOMContentLoaded', function() {
+        // Update the stats cards with real data
+        document.getElementById('total-paid').textContent = 'TZS {{ total_paid|floatformat:2 }}';
+        document.getElementById('completed-payments').textContent = '{{ payments.count }}';
+        document.getElementById('pending-payments').textContent = '{{ payments.filter|length }}';
+        document.getElementById('total-transactions').textContent = '{{ total_payments }}';
+        
+        // Initialize date pickers
+        const dateRange = document.getElementById('dateRange');
+        const startDateContainer = document.getElementById('startDateContainer');
+        const endDateContainer = document.getElementById('endDateContainer');
+        
+        dateRange.addEventListener('change', function() {
+            if (this.value === 'custom') {
+                startDateContainer.style.display = 'block';
+                endDateContainer.style.display = 'block';
+            } else {
+                startDateContainer.style.display = 'none';
+                endDateContainer.style.display = 'none';
+                // Here you would apply the selected date range filter
+                // For now, we'll just reload the table
+                loadPayments();
+            }
+        });
+        
+        // Apply filters button
+        document.getElementById('applyFilters').addEventListener('click', function() {
+            loadPayments();
+        });
+        
+        // Reset filters button
+        document.getElementById('resetFilters').addEventListener('click', function() {
+            document.getElementById('statusFilter').value = '';
+            document.getElementById('methodFilter').value = '';
+            document.getElementById('dateRange').value = 'all';
+            startDateContainer.style.display = 'none';
+            endDateContainer.style.display = 'none';
+            loadPayments();
+        });
+        
+        // Sort dropdown items
+        document.querySelectorAll('[data-sort]').forEach(item => {
+            item.addEventListener('click', function(e) {
+                e.preventDefault();
+                const sortBy = this.getAttribute('data-sort');
+                // Here you would handle the sorting logic
+                console.log('Sort by:', sortBy);
+                // For now, we'll just update the button text
+                document.getElementById('sortDropdown').innerHTML = 
+                    `<i class="fas fa-sort me-1"></i>${this.textContent}`;
+            });
+        });
+        
+        // Load initial payment data
+        function loadPayments() {
+            // This would be an AJAX call to your backend
+            // For now, we'll just show a message
+            const tbody = document.getElementById('paymentsTableBody');
+            tbody.innerHTML = `
+                <tr>
+                    <td colspan="8" class="text-center py-4">
+                        <div class="spinner-border text-primary" role="status">
+                            <span class="visually-hidden">Loading...</span>
+                        </div>
+                        <p class="mt-2 mb-0">Loading payment history...</p>
+                    </td>
+                </tr>`;
+                
+            // Simulate API call
+            setTimeout(() => {
+                // This is just sample data - replace with actual API call
+                updateStats({
+                    totalPaid: 12500,
+                    completedPayments: 24,
+                    pendingPayments: 5,
+                    totalTransactions: 29
+                });
+                
+                // In a real app, you would fetch this from your API
+                const sampleData = [
+                    {
+                        id: 1,
+                        date: '2023-06-15',
+                        tenant: 'John Doe',
+                        property: 'Sunset Apartments',
+                        amount: 500,
+                        status: 'Paid',
+                        method: 'M-Pesa',
+                        reference: 'MP123456789'
+                    },
+                    // Add more sample data as needed
+                ];
+                
+                renderPayments(sampleData);
+            }, 1000);
+        }
+        
+        function renderPayments(payments) {
+            const tbody = document.getElementById('paymentsTableBody');
+            
+            if (!payments || payments.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="8" class="text-center py-5">
+                            <i class="fas fa-inbox fa-3x text-muted mb-3"></i>
+                            <h5 class="text-muted">No payments found</h5>
+                            <p class="text-muted mb-0">No payment records match your current filters.</p>
+                        </td>
+                    </tr>`;
+                return;
+            }
+            
+            let html = '';
+            
+            payments.forEach(payment => {
+                let statusClass = '';
+                switch(payment.status.toLowerCase()) {
+                    case 'paid':
+                        statusClass = 'success';
+                        break;
+                    case 'pending':
+                        statusClass = 'warning';
+                        break;
+                    case 'failed':
+                    case 'late':
+                        statusClass = 'danger';
+                        break;
+                    default:
+                        statusClass = 'info';
+                }
+                
+                // Format date for display
+                const date = new Date(payment.date);
+                const formattedDate = date.toLocaleDateString('en-US', {
+                    year: 'numeric',
+                    month: 'short',
+                    day: 'numeric'
+                });
+                
+                html += `
+                    <tr data-payment-id="${payment.id}">
+                        <td data-label="Date">${formattedDate}</td>
+                        <td data-label="Tenant">${payment.tenant}</td>
+                        <td data-label="Property">${payment.property}</td>
+                        <td data-label="Amount">TZS ${payment.amount.toLocaleString()}</td>
+                        <td data-label="Status">
+                            <span class="badge badge-${statusClass}">${payment.status}</span>
+                        </td>
+                        <td data-label="Method">${payment.method}</td>
+                        <td data-label="Reference">${payment.reference}</td>
+                        <td class="text-end" data-label="Actions">
+                            <button class="btn btn-sm btn-outline-primary view-payment" data-bs-toggle="modal" data-bs-target="#paymentDetailsModal">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                        </td>
+                    </tr>`;
+            });
+            
+            tbody.innerHTML = html;
+            
+            // Add event listeners to view buttons
+            document.querySelectorAll('.view-payment').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const paymentId = this.closest('tr').getAttribute('data-payment-id');
+                    // Here you would fetch the payment details
+                    showPaymentDetails(paymentId);
+                });
+            });
+        }
+        
+        function showPaymentDetails(paymentId) {
+            // In a real app, you would fetch the payment details from your API
+            const content = document.getElementById('paymentDetailsContent');
+            content.innerHTML = `
+                <div class="text-center py-4">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                    <p class="mt-2">Loading payment details...</p>
+                </div>`;
+                
+            // Simulate API call
+            setTimeout(() => {
+                // Sample payment details
+                content.innerHTML = `
+                    <div class="row mb-4">
+                        <div class="col-md-6">
+                            <h6 class="text-muted mb-1">Payment ID</h6>
+                            <p class="mb-3">#${paymentId}</p>
+                            
+                            <h6 class="text-muted mb-1">Tenant</h6>
+                            <p class="mb-3">John Doe</p>
+                            
+                            <h6 class="text-muted mb-1">Property</h6>
+                            <p class="mb-3">Sunset Apartments, Unit 4B</p>
+                        </div>
+                        <div class="col-md-6">
+                            <h6 class="text-muted mb-1">Amount</h6>
+                            <h4 class="mb-3">TZS 500,000</h4>
+                            
+                            <h6 class="text-muted mb-1">Status</h6>
+                            <p><span class="badge bg-success">Paid</span></p>
+                            
+                            <h6 class="text-muted mb-1">Payment Method</h6>
+                            <p class="mb-3">M-Pesa</p>
+                        </div>
+                    </div>
+                    <div class="border-top pt-3">
+                        <h6 class="text-muted mb-3">Payment Details</h6>
+                        <div class="table-responsive">
+                            <table class="table table-sm">
+                                <thead>
+                                    <tr>
+                                        <th>Description</th>
+                                        <th class="text-end">Amount</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>Rent for June 2023</td>
+                                        <td class="text-end">TZS 450,000</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Water Bill</td>
+                                        <td class="text-end">TZS 35,000</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Electricity</td>
+                                        <td class="text-end">TZS 15,000</td>
+                                    </tr>
+                                    <tr class="table-active">
+                                        <td class="fw-bold">Total</td>
+                                        <td class="text-end fw-bold">TZS 500,000</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>`;
+            }, 1000);
+        }
+        
+        function updateStats(stats) {
+            document.getElementById('total-paid').textContent = `TZS ${stats.totalPaid.toLocaleString()}`;
+            document.getElementById('completed-payments').textContent = stats.completedPayments;
+            document.getElementById('pending-payments').textContent = stats.pendingPayments;
+            document.getElementById('total-transactions').textContent = stats.totalTransactions;
+        }
+        
+        // Initialize any filters from the URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const statusFilter = urlParams.get('status');
+        const startDate = urlParams.get('start_date');
+        
+        if (statusFilter) {
+            document.getElementById('statusFilter').value = statusFilter;
+        }
+        
+        if (startDate) {
+            document.getElementById('dateRange').value = 'custom';
+            document.getElementById('startDate').value = startDate;
+            document.getElementById('startDateContainer').style.display = 'block';
+        }
+    });
+</script>
+{% endblock %}
+        :root {
+            --primary: #2563eb;
+            --secondary: #1e40af;
+            --success: #16a34a;
+            --warning: #ea580c;
+            --danger: #dc2626;
+            --info: #0891b2;
+            --light: #f8fafc;
+            --dark: #0f172a;
+            --gray-200: #e2e8f0;
+            --gray-300: #cbd5e1;
+            --gray-500: #64748b;
+            --gray-700: #334155;
+        }
+
+        * {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #334155 100%);
+            min-height: 100vh;
+            color: #334155;
+        }
+
+        .navbar {
+            background: white;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            border-bottom: 2px solid #2563eb;
+        }
+
+        .navbar-brand {
+            font-size: 1.5rem;
+            font-weight: 800;
+            color: #2563eb !important;
+        }
+
+        .page-wrapper {
+            padding: 3rem 0;
+        }
+
+        .page-title {
+            margin-bottom: 2.5rem;
+        }
+
+        .page-title h1 {
+            font-size: 2.5rem;
+            font-weight: 800;
+            color: white;
+            margin-bottom: 0.5rem;
+            text-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        .page-title p {
+            font-size: 1.1rem;
+            color: rgba(255, 255, 255, 0.8);
+            margin-bottom: 0;
+        }
+
+        .back-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 1.5rem;
+            color: rgba(255, 255, 255, 0.9);
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 0.95rem;
+            transition: all 0.3s ease;
+        }
+
+        .back-link:hover {
+            color: white;
+            transform: translateX(-4px);
+        }
+
+        /* Header Card */
+        .header-card {
+            background: linear-gradient(135deg, #2563eb 0%, #1e40af 50%, #1e3a8a 100%);
+            color: white;
+            border-radius: 16px;
+            padding: 2.5rem;
+            margin-bottom: 2.5rem;
+            box-shadow: 0 20px 40px rgba(37, 99, 235, 0.25);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .header-card::before {
+            content: '';
+            position: absolute;
+            top: -100px;
+            right: -100px;
+            width: 400px;
+            height: 400px;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+            border-radius: 50%;
+        }
+
+        .header-card::after {
+            content: '';
+            position: absolute;
+            bottom: -50px;
+            left: -50px;
+            width: 300px;
+            height: 300px;
+            background: radial-gradient(circle, rgba(255,255,255,0.08) 0%, transparent 70%);
+            border-radius: 50%;
+        }
+
+        .header-content {
+            position: relative;
+            z-index: 1;
+        }
+
+        .property-header {
+            display: flex;
+            align-items: center;
+            gap: 2rem;
+            margin-bottom: 2.5rem;
+        }
+
+        .property-icon {
+            width: 80px;
+            height: 80px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.5rem;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            flex-shrink: 0;
+        }
+
+        .property-details h2 {
+            margin: 0;
+            font-size: 2rem;
+            font-weight: 800;
+            margin-bottom: 0.5rem;
+        }
+
+        .property-details p {
+            margin: 0;
+            opacity: 1;
+            font-size: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        /* Stats Grid */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .stat-card {
+            background: rgba(255, 255, 255, 0.12);
+            backdrop-filter: blur(12px);
+            border-radius: 14px;
+            padding: 1.75rem;
+            text-align: center;
+            border: 1px solid rgba(255, 255, 255, 0.25);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .stat-card:hover {
+            background: rgba(255, 255, 255, 0.18);
+            border-color: rgba(255, 255, 255, 0.4);
+            transform: translateY(-6px);
+            box-shadow: 0 12px 24px rgba(0, 0, 0, 0.15);
+        }
+
+        .stat-value {
+            font-size: 2rem;
+            font-weight: 800;
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-label {
+            font-size: 0.8rem;
+            opacity: 0.95;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-weight: 600;
+        }
+
+        /* Filter Section */
+        .filter-card {
+            background: white;
+            border-radius: 14px;
+            padding: 2rem;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+            margin-bottom: 2.5rem;
+            border: 1px solid #e2e8f0;
+        }
+
+        .filter-card h5 {
+            font-weight: 700;
+            margin-bottom: 1.5rem;
+            color: #0f172a;
+            font-size: 1.1rem;
+        }
+
+        .filter-form {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+            align-items: end;
+        }
+
+        .form-group label {
+            font-weight: 700;
+            font-size: 0.95rem;
+            margin-bottom: 0.75rem;
+            color: #334155;
+            display: block;
+        }
+
+        .form-control {
+            border: 2px solid #e2e8f0;
+            border-radius: 10px;
+            padding: 0.85rem;
+            transition: all 0.3s ease;
+            font-size: 0.95rem;
+            background: #f8fafc;
+        }
+
+        .form-control:focus {
+            border-color: #2563eb;
+            background: white;
+            box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.1);
+            outline: none;
+        }
+
+        /* Buttons */
+        .btn-filter {
+            background: linear-gradient(135deg, #2563eb 0%, #1e40af 100%);
+            border: none;
+            border-radius: 10px;
+            color: white;
+            font-weight: 700;
+            padding: 0.85rem 2.5rem;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            font-size: 0.95rem;
+            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+        }
+
+        .btn-filter:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(37, 99, 235, 0.4);
+        }
+
+        .btn-clear {
+            background: #f1f5f9;
+            border: 2px solid #e2e8f0;
+            color: #334155;
+            border-radius: 10px;
+            padding: 0.85rem 2rem;
+            transition: all 0.3s ease;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .btn-clear:hover {
+            background: #e2e8f0;
+            color: #0f172a;
+            border-color: #cbd5e1;
+        }
+
+        /* Table Container */
+        .table-card {
+            background: white;
+            border-radius: 14px;
+            overflow: hidden;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+            margin-bottom: 2.5rem;
+            border: 1px solid #e2e8f0;
+        }
+
+        .table-header-bar {
+            background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+            padding: 1.75rem;
+            border-bottom: 2px solid #e2e8f0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1.5rem;
+        }
+
+        .table-header-bar h5 {
+            margin: 0;
+            font-weight: 700;
+            color: #0f172a;
+            font-size: 1.15rem;
+        }
+
+        .export-buttons {
+            display: flex;
+            gap: 0.75rem;
+            flex-wrap: wrap;
+        }
+
+        .export-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.6rem;
+            padding: 0.65rem 1.25rem;
+            border: 2px solid #e2e8f0;
+            background: white;
+            border-radius: 10px;
+            color: #334155;
+            text-decoration: none;
+            font-size: 0.9rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .export-btn:hover {
+            background: linear-gradient(135deg, #2563eb 0%, #1e40af 100%);
+            color: white;
+            border-color: #2563eb;
+            transform: translateY(-3px);
+            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2);
+        }
+
+        /* Table Styling */
+        .payments-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.95rem;
+        }
+
+        .payments-table thead {
+            background: #f8fafc;
+        }
+
+        .payments-table th {
+            padding: 1.25rem;
+            font-weight: 700;
+            color: #334155;
+            text-transform: uppercase;
+            font-size: 0.8rem;
+            letter-spacing: 0.8px;
+            border-bottom: 2px solid #cbd5e1;
+        }
+
+        .payments-table td {
+            padding: 1.25rem;
+            border-bottom: 1px solid #e2e8f0;
+            vertical-align: middle;
+        }
+
+        .payments-table tbody tr {
+            transition: all 0.3s ease;
+        }
+
+        .payments-table tbody tr:hover {
+            background-color: #f0f4f8;
+        }
+
+        .amount-strong {
+            font-weight: 800;
+            color: #0f172a;
+            font-size: 1.1rem;
+        }
+
+        .text-muted-small {
+            color: #64748b;
+            font-size: 0.85rem;
+        }
+
+        /* Status Badges */
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.6rem;
+            padding: 0.6rem 1.25rem;
+            border-radius: 24px;
+            font-weight: 700;
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+        }
+
+        .status-paid {
+            background: #dcfce7;
+            color: #166534;
+        }
+
+        .status-pending {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .status-late {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        .status-failed {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        .status-refunded {
+            background: #dbeafe;
+            color: #1e40af;
+        }
+
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 4.5rem 2rem;
+            color: #64748b;
+        }
+
+        .empty-state i {
+            font-size: 5rem;
+            margin-bottom: 1.5rem;
+            color: #cbd5e1;
+        }
+
+        .empty-state h3 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 0.75rem;
+            color: #334155;
+        }
+
+        .empty-state p {
+            margin: 0;
+            color: #64748b;
+            font-size: 1rem;
+        }
+
+        /* Summary Cards */
+        .summary-section {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 1.5rem;
+            margin-top: 2.5rem;
+        }
+
+        .summary-box {
+            background: white;
+            border-radius: 14px;
+            padding: 2.25rem;
+            text-align: center;
+            border-left: 6px solid;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+            border-top: 1px solid #e2e8f0;
+            border-right: 1px solid #e2e8f0;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .summary-box:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 12px 28px rgba(0, 0, 0, 0.12);
+        }
+
+        .summary-box.box-paid {
+            border-left-color: #16a34a;
+        }
+
+        .summary-box.box-pending {
+            border-left-color: #ea580c;
+        }
+
+        .summary-box.box-late {
+            border-left-color: #dc2626;
+        }
+
+        .summary-box.box-total {
+            background: linear-gradient(135deg, #2563eb 0%, #1e40af 100%);
+            color: white;
+            border-left-color: white;
+        }
+
+        .summary-label {
+            font-size: 0.85rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            margin-bottom: 1rem;
+            opacity: 0.9;
+        }
+
+        .summary-amount {
+            font-size: 2.5rem;
+            font-weight: 800;
+            margin-bottom: 0;
+        }
+
+        /* Action Buttons */
+        .action-section {
+            background: white;
+            border-radius: 14px;
+            padding: 2.5rem;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+            margin-top: 2.5rem;
+            text-align: center;
+            border: 1px solid #e2e8f0;
+        }
+
+        .action-section h5 {
+            font-size: 1.25rem;
+            font-weight: 800;
+            color: #0f172a;
+        }
+
+        .action-section p {
+            color: #64748b;
+            margin-bottom: 1.5rem;
+        }
+
+        .action-buttons {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 1.5rem;
+            margin-top: 2rem;
+        }
+
+        .action-btn {
+            display: inline-flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 1rem;
+            padding: 2rem 1.5rem;
+            border: 2px solid #e2e8f0;
+            background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+            border-radius: 12px;
+            text-decoration: none;
+            color: #0f172a;
+            font-weight: 700;
+            transition: all 0.3s ease;
+        }
+
+        .action-btn i {
+            font-size: 2.5rem;
+            color: #2563eb;
+            transition: all 0.3s ease;
+        }
+
+        .action-btn:hover {
+            border-color: #2563eb;
+            background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
+            color: #1e40af;
+            transform: translateY(-6px);
+            box-shadow: 0 8px 20px rgba(37, 99, 235, 0.15);
+        }
+
+        .action-btn:hover i {
+            color: #1e40af;
+            transform: scale(1.1);
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .page-title h1 {
+                font-size: 1.75rem;
+            }
+
+            .property-header {
+                flex-direction: column;
+                text-align: center;
+            }
+
+            .filter-form {
+                grid-template-columns: 1fr;
+            }
+
+            .table-header-bar {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .export-buttons {
+                justify-content: center;
+            }
+
+            .payments-table {
+                font-size: 0.85rem;
+            }
+
+            .payments-table th,
+            .payments-table td {
+                padding: 0.85rem;
+            }
+
+            .summary-section {
+                grid-template-columns: 1fr;
+            }
+
+            .action-buttons {
+                grid-template-columns: 1fr;
+            }
+        }
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-light">
+        <div class="container-fluid px-4">
+            <a class="navbar-brand fw-bold" href="/">
+                <i class="fas fa-key"></i> WAPANGAJI
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'tenancy:tenant_dashboard' %}">Dashboard</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/">Home</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Page Wrapper -->
+    <div class="page-wrapper">
+        <div class="container-fluid px-4">
+            <!-- Back Link & Title -->
+            <div class="page-title">
+                <a href="/tenancy/dashboard/" class="back-link">
+                    <i class="fas fa-arrow-left"></i> Back to Dashboard
+                </a>
+                <h1><i class="fas fa-history"></i> Payment History</h1>
+                <p class="text-muted">Track and manage all your rent payments</p>
+            </div>
+
+            <!-- Header Card with Property Info -->
+            <div class="header-card">
+                <div class="header-content">
+                    <div class="property-header">
+                        <div class="property-icon">
+                            <i class="fas fa-building"></i>
+                        </div>
+                        <div class="property-details flex-grow-1">
+                            <h2>{{ property.name }}</h2>
+                            <p><i class="fas fa-map-marker-alt"></i> {{ unit.unit_number }} • {{ property.address }}</p>
+                        </div>
+                    </div>
+                    
+                    <!-- Quick Stats -->
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <div class="stat-value">{{ total_paid|default:"0" }}</div>
+                            <div class="stat-label">Total Paid</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-value">{{ total_pending|default:"0" }}</div>
+                            <div class="stat-label">Pending</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-value">{{ total_late|default:"0" }}</div>
+                            <div class="stat-label">Late</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-value">{{ payments|length }}</div>
+                            <div class="stat-label">Total Records</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Filter Section -->
+            <div class="filter-card">
+                <h5><i class="fas fa-sliders-h"></i> Filter Payments</h5>
+                <form method="GET" class="filter-form">
+                    <div class="form-group">
+                        <label for="status">Status</label>
+                        <select name="status" id="status" class="form-control">
+                            <option value="">All Statuses</option>
+                            <option value="Paid" {% if request.GET.status == "Paid" %}selected{% endif %}>Paid</option>
+                            <option value="Pending" {% if request.GET.status == "Pending" %}selected{% endif %}>Pending</option>
+                            <option value="Late" {% if request.GET.status == "Late" %}selected{% endif %}>Late</option>
+                            <option value="Failed" {% if request.GET.status == "Failed" %}selected{% endif %}>Failed</option>
+                            <option value="Refunded" {% if request.GET.status == "Refunded" %}selected{% endif %}>Refunded</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="start_date">From Date</label>
+                        <input type="date" name="start_date" id="start_date" class="form-control" value="{{ request.GET.start_date }}">
+                    </div>
+                    
+                    <button type="submit" class="btn-filter">
+                        <i class="fas fa-filter"></i> Filter
+                    </button>
+                    
+                    {% if request.GET.status or request.GET.start_date %}
+                        <a href="{% url 'tenancy:payment_history' %}" class="btn-clear">
+                            <i class="fas fa-times"></i> Clear
+                        </a>
+                    {% endif %}
+                </form>
+            </div>
+
+            <!-- Payments Table -->
+            <div class="table-card">
+                <div class="table-header-bar">
+                    <h5><i class="fas fa-list-check"></i> Payment Records</h5>
+                    <div class="export-buttons">
+                        <button onclick="window.print()" class="export-btn">
+                            <i class="fas fa-print"></i> Print
+                        </button>
+                        <a href="#" class="export-btn">
+                            <i class="fas fa-file-csv"></i> CSV
+                        </a>
+                        <a href="#" class="export-btn">
+                            <i class="fas fa-file-pdf"></i> PDF
+                        </a>
+                    </div>
+                </div>
+
+                {% if payments %}
+                    <div class="table-responsive">
+                        <table class="payments-table">
+                            <thead>
+                                <tr>
+                                    <th>Payment Date</th>
+                                    <th>Amount</th>
+                                    <th>Status</th>
+                                    <th>Method</th>
+                                    <th>Reference</th>
+                                    <th>Recorded</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for payment in payments %}
+                                    <tr>
+                                        <td>
+                                            <strong>{{ payment.date|date:"M d, Y" }}</strong>
+                                            <br>
+                                            <span class="text-muted-small">{{ payment.date|date:"l" }}</span>
+                                        </td>
+                                        <td>
+                                            <span class="amount-strong">TZS {{ payment.amount|floatformat:2 }}</span>
+                                        </td>
+                                        <td>
+                                            <span class="status-badge status-{{ payment.status|lower }}">
+                                                <i class="fas 
+                                                    {% if payment.status == 'Paid' %}fa-check-circle
+                                                    {% elif payment.status == 'Pending' %}fa-hourglass-half
+                                                    {% elif payment.status == 'Late' %}fa-exclamation-circle
+                                                    {% elif payment.status == 'Failed' %}fa-times-circle
+                                                    {% elif payment.status == 'Refunded' %}fa-undo-alt
+                                                    {% endif %}"></i>
+                                                {{ payment.status }}
+                                            </span>
+                                        </td>
+                                        <td>
+                                            <span class="text-muted-small">
+                                                {% if payment.method %}
+                                                    <i class="fas fa-money-bill"></i> {{ payment.method }}
+                                                {% else %}
+                                                    <em>N/A</em>
+                                                {% endif %}
+                                            </span>
+                                        </td>
+                                        <td>
+                                            <span class="text-muted-small">{{ payment.reference_number|default:"—" }}</span>
+                                        </td>
+                                        <td>
+                                            <span class="text-muted-small">{{ payment.created_at|date:"M d, Y" }}</span>
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% else %}
+                    <div class="empty-state">
+                        <i class="fas fa-inbox"></i>
+                        <h3>No Payment Records</h3>
+                        <p>{% if request.GET.status or request.GET.start_date %}No payments match your filters.{% else %}You don't have any recorded payments yet.{% endif %}</p>
+                    </div>
+                {% endif %}
+            </div>
+
+            <!-- Summary Cards -->
+            {% if payments %}
+                <div class="summary-section">
+                    <div class="summary-box box-paid">
+                        <div class="summary-label">
+                            <i class="fas fa-check-circle"></i> Amount Paid
+                        </div>
+                        <div class="summary-amount">TZS {{ total_paid|default:"0" }}</div>
+                    </div>
+                    <div class="summary-box box-pending">
+                        <div class="summary-label">
+                            <i class="fas fa-hourglass-half"></i> Pending
+                        </div>
+                        <div class="summary-amount">TZS {{ total_pending|default:"0" }}</div>
+                    </div>
+                    <div class="summary-box box-late">
+                        <div class="summary-label">
+                            <i class="fas fa-exclamation-circle"></i> Late
+                        </div>
+                        <div class="summary-amount">TZS {{ total_late|default:"0" }}</div>
+                    </div>
+                    <div class="summary-box box-total">
+                        <div class="summary-label">
+                            <i class="fas fa-calculator"></i> Total
+                        </div>
+                        <div class="summary-amount">TZS {{ overall_total|default:"0" }}</div>
+                    </div>
+                </div>
+            {% endif %}
+
+            <!-- Action Section -->
+            <div class="action-section">
+                <h5 class="mb-0">Quick Actions</h5>
+                <p class="text-muted mt-2">Manage your payments</p>
+                <div class="action-buttons">
+                    <a href="{% url 'tenancy:add_payment' tenancy.id %}" class="action-btn">
+                        <i class="fas fa-credit-card"></i>
+                        Make Payment
+                    </a>
+                    <a href="#" class="action-btn">
+                        <i class="fas fa-calendar-check"></i>
+                        Schedule Payment
+                    </a>
+                    <a href="#" class="action-btn">
+                        <i class="fas fa-file-invoice"></i>
+                        Download Receipt
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Auto-submit filter when status changes
+        document.getElementById('status')?.addEventListener('change', function() {
+            this.closest('form').submit();
+        });
+
+        // Add visual feedback to table rows on hover
+        document.querySelectorAll('.payments-table tbody tr').forEach(row => {
+            row.addEventListener('mouseenter', function() {
+                this.style.backgroundColor = 'rgba(102, 126, 234, 0.05)';
+            });
+            row.addEventListener('mouseleave', function() {
+                this.style.backgroundColor = '';
+            });
+        });
+    </script>
+</body>
+</html>

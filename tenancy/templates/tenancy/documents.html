@@ -1,0 +1,187 @@
+{% extends 'tenancy/tenant_base.html' %}
+{% load static %}
+
+{% block title %}Documents - {{ request.user.get_full_name|default:request.user.username }}{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h1><i class="fas fa-file-contract me-2"></i>Property Documents</h1>
+            <p class="text-muted mb-0">View and download important documents from your landlord</p>
+        </div>
+        <a href="{% url 'tenancy:tenant_dashboard' %}" class="btn btn-outline-secondary">
+            <i class="fas fa-arrow-left me-1"></i> Back to Dashboard
+        </a>
+    </div>
+
+    <!-- Stats Cards -->
+    {% if documents %}
+    <div class="row mb-4">
+        <div class="col-md-4 mb-3">
+            <div class="card border-left-primary shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
+                                Total Documents</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">{{ documents|length }}</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-file-alt fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-3">
+            <div class="card border-left-success shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-success text-uppercase mb-1">
+                                Lease Agreements</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">{{ lease_count }}</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-file-signature fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-3">
+            <div class="card border-left-info shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-info text-uppercase mb-1">
+                                House Rules</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">{{ rules_count }}</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-clipboard-list fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Documents Section -->
+    <div class="card shadow mb-4">
+        <div class="card-header py-3">
+            <h6 class="m-0 font-weight-bold text-primary">
+                <i class="fas fa-folder-open me-1"></i> Available Documents
+            </h6>
+        </div>
+        <div class="card-body">
+            {% if documents %}
+            <div class="row">
+                {% for document in documents %}
+                <div class="col-md-6 col-lg-4 mb-4">
+                    <div class="document-card card h-100 border-left-primary">
+                        <div class="card-body">
+                            <div class="d-flex align-items-center mb-3">
+                                <div class="document-icon bg-primary text-white rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 50px; height: 50px;">
+                                    <i class="fas fa-file-pdf fa-lg"></i>
+                                </div>
+                                <div>
+                                    <span class="badge bg-primary text-white">{{ document.get_document_type_display }}</span>
+                                    <h5 class="card-title mb-0 mt-1">{{ document.title }}</h5>
+                                </div>
+                            </div>
+                            <p class="card-text text-muted small">
+                                {{ document.description|default:"No description provided" }}
+                            </p>
+                            <div class="d-flex justify-content-between align-items-center">
+                                <small class="text-muted">
+                                    <i class="far fa-calendar-alt me-1"></i>
+                                    {{ document.uploaded_at|date:"M d, Y" }}
+                                </small>
+                                <div>
+                                    {% if document.file %}
+                                    <a href="{{ document.file.url }}" target="_blank" class="btn btn-sm btn-outline-secondary me-1">
+                                        <i class="fas fa-eye"></i> Preview
+                                    </a>
+                                    {% endif %}
+                                    <a href="{% url 'tenancy:download_document' document.id %}" class="btn btn-sm btn-primary">
+                                        <i class="fas fa-download"></i> Download
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            {% else %}
+            <div class="text-center py-5">
+                <i class="fas fa-folder-open fa-4x text-gray-300 mb-3"></i>
+                <h5 class="text-gray-600">No documents available</h5>
+                <p class="text-muted small">Your landlord has not uploaded any documents yet.</p>
+                <p class="text-muted small mt-2">Documents like lease agreements and house rules will appear here.</p>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<style>
+.document-card {
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    border-left: 4px solid #4e73df !important;
+}
+
+.document-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15) !important;
+}
+
+.document-icon {
+    width: 50px;
+    height: 50px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 8px;
+    font-size: 1.5rem;
+}
+
+.card {
+    border: none;
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 0.15rem 1.75rem 0 rgba(58, 59, 69, 0.1) !important;
+}
+
+.card-header {
+    background-color: #f8f9fc;
+    border-bottom: 1px solid #e3e6f0;
+}
+
+.btn-primary {
+    background-color: #4e73df;
+    border-color: #4e73df;
+}
+
+.btn-primary:hover {
+    background-color: #2e59d9;
+    border-color: #2653d4;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .document-card {
+        margin-bottom: 1rem;
+    }
+    
+    .btn {
+        padding: 0.25rem 0.5rem;
+        font-size: 0.875rem;
+    }
+}
+</style>
+{% endblock %}
+</html>

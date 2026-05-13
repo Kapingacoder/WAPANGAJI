@@ -1,0 +1,300 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Dashboard - WAPANGAJI</title>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="{% static 'tenancy/style.css' %}" />
+  </head>
+  <body class="dashboard-body">
+    <main class="dashboard-container">
+      <div class="dashboard-sticky-header">
+        <div class="dashboard-header">
+          <div class="welcome-message">
+            <h1 class="dashboard-title">
+              Welcome, {{ user.first_name|default:user.username }}!
+            </h1>
+            {% if tenancy %}
+            <p class="dashboard-subtitle">
+              You're currently renting {{ tenancy.unit.property.name }} - {{ tenancy.unit.unit_number }}
+            </p>
+            {% else %}
+            <p class="dashboard-subtitle">You don't have an active tenancy.</p>
+            {% endif %}
+          </div>
+          <div class="header-actions">
+            <a href="{% url 'home:logout' %}" class="logout-btn" title="Logout">
+              <i class="fas fa-sign-out-alt"></i>
+              <span>Logout</span>
+            </a>
+          </div>
+        </div>
+
+        <div class="dashboard-summary">
+          {% if tenancy %}
+          <div class="summary-card">
+            <i class="fas fa-home"></i>
+            <div class="summary-details">
+              <span class="summary-label">Next Rent Due</span>
+              <span class="summary-value"
+                >{{ next_payment_date|date:"M d, Y" }}</span
+              >
+            </div>
+          </div>
+          <div class="summary-card">
+            <i class="fas fa-wallet"></i>
+            <div class="summary-details">
+              <span class="summary-label">Rent Amount</span>
+              <span class="summary-value"
+                >TZS {{ tenancy.unit.property.rent|floatformat:2 }}</span
+              >
+            </div>
+          </div>
+          {% endif %}
+        </div>
+      </div>
+
+      <h2 class="section-title">Quick Actions</h2>
+      <div class="icon-grid">
+        <!-- Messages -->
+        <a href="{% url 'tenancy:messages_list' %}" class="icon-card">
+          <div class="icon-wrapper">
+            <i class="fas fa-envelope"></i>
+            {% if unread_count > 0 %}
+            <span class="notification-badge">{{ unread_count }}</span>
+            {% endif %}
+          </div>
+          <span class="icon-label">Messages</span>
+        </a>
+
+        <!-- Maintenance -->
+        <a href="{% url 'tenancy:maintenance_requests' %}" class="icon-card">
+          <div class="icon-wrapper">
+            <i class="fas fa-tools"></i>
+            {% if maintenance_count > 0 %}
+            <span class="notification-badge">{{ maintenance_count }}</span>
+            {% endif %}
+          </div>
+          <span class="icon-label">Maintenance</span>
+        </a>
+
+        <!-- Make Payment -->
+        {% if tenancy %}
+        <a href="{% url 'tenancy:add_payment' tenancy.id %}" class="icon-card">
+          <div class="icon-wrapper">
+            <i class="fas fa-money-bill-wave"></i>
+          </div>
+          <span class="icon-label">Make Payment</span>
+        </a>
+        {% endif %}
+
+        <!-- Payment Receipts -->
+        <a href="{% url 'tenancy:payment_receipts' %}" class="icon-card">
+          <div class="icon-wrapper">
+            <i class="fas fa-receipt"></i>
+          </div>
+          <span class="icon-label">Receipts</span>
+        </a>
+
+        <!-- Property Details -->
+        {% if tenancy %}
+        <a
+          href="{% url 'tenancy:property_details' tenancy.unit.property.id %}"
+          class="icon-card"
+        >
+          <div class="icon-wrapper">
+            <i class="fas fa-home"></i>
+          </div>
+          <span class="icon-label">Property</span>
+        </a>
+        {% endif %}
+
+        <!-- Contact Landlord -->
+        <a href="{% url 'tenancy:send_message' %}" class="icon-card">
+          <div class="icon-wrapper">
+            <i class="fas fa-headset"></i>
+          </div>
+          <span class="icon-label">Contact</span>
+        </a>
+
+        <!-- Documents -->
+        <a href="{% url 'tenancy:view_documents' %}" class="icon-card">
+          <div class="icon-wrapper">
+            <i class="fas fa-file-contract"></i>
+          </div>
+          <span class="icon-label">Documents</span>
+        </a>
+
+        <!-- Settings -->
+        <a href="{% url 'users:profile' %}" class="icon-card">
+          <div class="icon-wrapper">
+            <i class="fas fa-cog"></i>
+          </div>
+          <span class="icon-label">Settings</span>
+        </a>
+      </div>
+
+<!-- Chatbot UI (floating WhatsApp/Messenger style) -->
+
+      <style>
+        /* Floating chat button */
+        .chat-fab {
+          position:fixed; bottom:24px; right:24px; width:56px; height:56px; border-radius:50%; background:#25D366; color:#fff; display:flex; align-items:center; justify-content:center; cursor:pointer; box-shadow:0 6px 18px rgba(0,0,0,0.12); z-index:1000; border:none; font-size:20px;
+        }
+        .chat-fab .badge { position:absolute; top:-6px; right:-6px; background:#ff3b30; color:#fff; border-radius:12px; padding:2px 6px; font-size:11px; }
+
+        /* Chat container */
+        .chatbot-container {
+          position:fixed; bottom:88px; right:24px; width:360px; max-width:calc(100% - 48px); background:#fff; border-radius:12px; box-shadow:0 18px 45px rgba(0,0,0,0.15); overflow:hidden; display:none; z-index:1000; font-family: 'Poppins', sans-serif;
+        }
+        .chat-header { background:#075E54; color:#fff; padding:12px 14px; display:flex; justify-content:space-between; align-items:center; }
+        .chat-header strong{ font-weight:600 }
+        .chat-body { height:340px; overflow:auto; padding:14px; background:#e9f6ef; }
+        .chat-footer { padding:10px; border-top:1px solid #eee; display:flex; gap:8px; background:#fff }
+        .chat-input { flex:1; padding:10px; border-radius:20px; border:1px solid #ddd; }
+        .chat-send { background:#25D366; color:#fff; border:none; padding:8px 12px; border-radius:18px; cursor:pointer }
+
+        /* Bubbles */
+        .msg { margin-bottom:10px; display:flex; flex-direction:column; }
+        .msg .meta { font-size:11px; color:#555; margin-bottom:6px }
+        .msg .bubble { display:inline-block; padding:10px 12px; border-radius:18px; max-width:78%; }
+        .msg.user { align-items:flex-end }
+        .msg.user .bubble { background:#DCF8C6; color:#000; border-bottom-right-radius:4px }
+        .msg.bot { align-items:flex-start }
+        .msg.bot .bubble { background:#fff; border:1px solid #e6e6e6 }
+
+        @media (max-width:420px){ .chatbot-container{ width:320px; right:12px; bottom:80px } .chat-fab { right:12px; bottom:20px } }
+      </style>
+
+      <button id="chat-icon" class="chat-fab" aria-label="Open chat">
+        <i class="fas fa-comment-dots"></i>
+        <span class="badge" id="chat-badge" style="display:none">1</span>
+      </button>
+
+      <div id="chatbot" class="chatbot-container" aria-hidden="true">
+        <div class="chat-header">
+          <strong>Wapangaji Chatbot</strong>
+          <button id="chat-toggle" aria-label="Close chat" style="background:transparent;border:none;color:#fff;font-weight:700;cursor:pointer">×</button>
+        </div>
+        <div id="chat-body" class="chat-body" aria-live="polite"></div>
+        <div class="chat-footer">
+          <input id="chat-input" class="chat-input" type="text" placeholder="Uliza kuhusu kodi, malipo, au matengenezo..." />
+          <button id="chat-send" class="chat-send">Tuma</button>
+        </div>
+      </div>
+
+      <script>
+        // CSRF helper
+        function getCookie(name) {
+          let cookieValue = null;
+          if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+              const cookie = cookies[i].trim();
+              if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+              }
+            }
+          }
+          return cookieValue;
+        }
+        const csrftoken = getCookie('csrftoken');
+
+        const chatIcon = document.getElementById('chat-icon');
+        const chatToggle = document.getElementById('chat-toggle');
+        const chatContainer = document.getElementById('chatbot');
+        const chatBody = document.getElementById('chat-body');
+        const chatInput = document.getElementById('chat-input');
+        const chatSend = document.getElementById('chat-send');
+        const chatBadge = document.getElementById('chat-badge');
+
+        function openChat() {
+          chatContainer.style.display = 'block';
+          chatContainer.setAttribute('aria-hidden', 'false');
+          chatInput.focus();
+          chatBadge.style.display = 'none';
+          // small entrance animation
+          chatContainer.style.transform = 'translateY(8px)';
+          chatContainer.style.opacity = '0';
+          setTimeout(() => { chatContainer.style.transition = 'all 220ms ease'; chatContainer.style.transform = 'translateY(0)'; chatContainer.style.opacity = '1'; }, 10);
+        }
+        function closeChat() {
+          chatContainer.style.display = 'none';
+          chatContainer.setAttribute('aria-hidden', 'true');
+        }
+
+        chatIcon.addEventListener('click', () => {
+          if (chatContainer.style.display === 'none' || chatContainer.style.display === '') openChat(); else closeChat();
+        });
+        chatToggle.addEventListener('click', closeChat);
+
+        function appendMessage(sender, text) {
+          const el = document.createElement('div');
+          el.className = 'msg ' + (sender === 'user' ? 'user' : 'bot');
+          const meta = document.createElement('div');
+          meta.className = 'meta';
+          meta.textContent = sender === 'user' ? 'Wewe' : 'Chatbot';
+          const bubble = document.createElement('div');
+          bubble.className = 'bubble';
+          bubble.innerHTML = text;
+          el.appendChild(meta);
+          el.appendChild(bubble);
+          chatBody.appendChild(el);
+          chatBody.scrollTop = chatBody.scrollHeight;
+        }
+
+        async function sendMessage() {
+          const msg = chatInput.value.trim();
+          if (!msg) return;
+          appendMessage('user', msg);
+          chatInput.value = '';
+
+          // Show thinking indicator for at least 3 seconds
+          const typingEl = document.createElement('div');
+          typingEl.className = 'msg bot';
+          typingEl.innerHTML = '<div class="meta">Chatbot</div><div class="bubble">thinking....</div>';
+          chatBody.appendChild(typingEl);
+          chatBody.scrollTop = chatBody.scrollHeight;
+
+          const start = Date.now();
+          try {
+            const resp = await fetch("{% url 'tenancy:chatbot_api' %}", {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': csrftoken
+              },
+              body: JSON.stringify({message: msg})
+            });
+            const data = await resp.json();
+            const minDelay = 3000;
+            const elapsed = Date.now() - start;
+            const wait = Math.max(0, minDelay - elapsed);
+            setTimeout(() => {
+              typingEl.remove();
+              appendMessage('bot', data.reply || 'Samahani, hitilafu ilitetokea.');
+            }, wait);
+          } catch (err) {
+            typingEl.remove();
+            appendMessage('bot', 'Samahani, tatizo la mtandao. Jaribu tena.');
+          }
+        }
+
+        chatSend.addEventListener('click', sendMessage);
+        chatInput.addEventListener('keydown', (e) => {
+          if (e.key === 'Enter') sendMessage();
+        });
+      </script>
+    </main>
+  </body>
+</html>

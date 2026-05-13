@@ -1,0 +1,220 @@
+{% extends 'landlord/landlord_base.html' %}
+{% load static %}
+
+{% block title %}Edit Payment - WAPANGAJI{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- Page Header -->
+    <div class="d-sm-flex align-items-center justify-content-between mb-4">
+        <h1 class="h3 mb-0 text-gray-800">Edit Payment</h1>
+        <div>
+            <a href="{% url 'tenancy:payment_details' payment.id %}" class="btn btn-secondary">
+                <i class="fas fa-arrow-left me-2"></i> Back to Payment
+            </a>
+        </div>
+    </div>
+
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card shadow mb-4">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">
+                        <i class="fas fa-edit me-2"></i>Update Payment Details
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <div class="mb-4">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <h5 class="text-gray-800 mb-3">
+                                    <i class="fas fa-user text-primary me-2"></i>Tenant Information
+                                </h5>
+                                <div class="pl-4">
+                                    <p class="mb-2">
+                                        <span class="font-weight-bold text-gray-700">Name:</span> 
+                                        <span class="float-right">{{ tenant.get_full_name|default:tenant.username }}</span>
+                                    </p>
+                                    <p class="mb-2">
+                                        <span class="font-weight-bold text-gray-700">Email:</span> 
+                                        <span class="float-right">{{ tenant.email }}</span>
+                                    </p>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <h5 class="text-gray-800 mb-3">
+                                    <i class="fas fa-home text-primary me-2"></i>Property Information
+                                </h5>
+                                <div class="pl-4">
+                                    <p class="mb-2">
+                                        <span class="font-weight-bold text-gray-700">Property:</span> 
+                                        <span class="float-right">{{ property.name }}</span>
+                                    </p>
+                                    <p class="mb-2">
+                                        <span class="font-weight-bold text-gray-700">Unit:</span> 
+                                        <span class="float-right">Unit {{ tenancy.unit.unit_number }}</span>
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <hr class="my-4">
+                    
+                    <form method="post" class="needs-validation" novalidate>
+                        {% csrf_token %}
+                        
+                        {% if form.non_field_errors %}
+                            <div class="alert alert-danger">
+                                {% for error in form.non_field_errors %}
+                                    {{ error }}
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                        
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="id_amount" class="form-label">
+                                        <i class="fas fa-money-bill-wave me-2 text-gray-600"></i>Amount (TZS)
+                                    </label>
+                                    {{ form.amount }}
+                                    {% if form.amount.errors %}
+                                        <div class="invalid-feedback d-block">
+                                            {{ form.amount.errors }}
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="id_date" class="form-label">
+                                        <i class="far fa-calendar-alt me-2 text-gray-600"></i>Payment Date
+                                    </label>
+                                    {{ form.date }}
+                                    {% if form.date.errors %}
+                                        <div class="invalid-feedback d-block">
+                                            {{ form.date.errors }}
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="id_status" class="form-label">
+                                        <i class="fas fa-info-circle me-2 text-gray-600"></i>Status
+                                    </label>
+                                    {{ form.status }}
+                                    {% if form.status.errors %}
+                                        <div class="invalid-feedback d-block">
+                                            {{ form.status.errors }}
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="id_method" class="form-label">
+                                        <i class="fas fa-credit-card me-2 text-gray-600"></i>Payment Method
+                                    </label>
+                                    {{ form.method }}
+                                    {% if form.method.errors %}
+                                        <div class="invalid-feedback d-block">
+                                            {{ form.method.errors }}
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group mb-4">
+                            <label for="id_notes" class="form-label">
+                                <i class="fas fa-sticky-note me-2 text-gray-600"></i>Notes
+                            </label>
+                            {{ form.notes }}
+                            {% if form.notes.errors %}
+                                <div class="invalid-feedback d-block">
+                                    {{ form.notes.errors }}
+                                </div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="d-flex justify-content-between mt-5">
+                            <div>
+                                <p class="text-muted small mb-0">
+                                    <i class="far fa-calendar-alt me-1"></i> Created: {{ payment.created_at|date:"M d, Y H:i" }}
+                                </p>
+                                {% if payment.updated_at != payment.created_at %}
+                                    <p class="text-muted small mb-0">
+                                        <i class="far fa-edit me-1"></i> Last Updated: {{ payment.updated_at|date:"M d, Y H:i" }}
+                                    </p>
+                                {% endif %}
+                            </div>
+                            <div>
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="fas fa-save me-2"></i> Update Payment
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Initialize form validation and date picker
+    document.addEventListener('DOMContentLoaded', function() {
+        // Initialize date picker
+        const dateField = document.getElementById('id_date');
+        if (dateField) {
+            // Set today's date if date field is empty
+            if (!dateField.value) {
+                const today = new Date();
+                const formattedDate = today.toISOString().substr(0, 10);
+                dateField.value = formattedDate;
+            }
+            
+            // Initialize flatpickr for better date picking if available
+            if (typeof flatpickr !== 'undefined') {
+                flatpickr("#id_date", {
+                    dateFormat: "Y-m-d",
+                    allowInput: true,
+                    maxDate: "today"
+                });
+            }
+        }
+        
+        // Add Bootstrap validation
+        const forms = document.querySelectorAll('.needs-validation');
+        Array.from(forms).forEach(form => {
+            form.addEventListener('submit', function(event) {
+                if (!form.checkValidity()) {
+                    event.preventDefault();
+                    event.stopPropagation();
+                }
+                form.classList.add('was-validated');
+            }, false);
+            
+            // Add validation on input change
+            const inputs = form.querySelectorAll('input, select, textarea');
+            inputs.forEach(input => {
+                input.addEventListener('input', function() {
+                    if (input.checkValidity()) {
+                        input.classList.remove('is-invalid');
+                        input.classList.add('is-valid');
+                    } else {
+                        input.classList.remove('is-valid');
+                        input.classList.add('is-invalid');
+                    }
+                });
+            });
+        });
+    });
+</script>
+{% endblock %}

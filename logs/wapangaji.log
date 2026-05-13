@@ -1,0 +1,198 @@
+2026-01-31 15:31:18,642 [INFO] django.utils.autoreload: Watching for file changes with StatReloader
+2026-01-31 15:31:25,996 [INFO] django.utils.autoreload: /Users/apple/Desktop/WAPANGAJI/home/views.py changed, reloading.
+2026-01-31 15:31:26,416 [INFO] django.utils.autoreload: Watching for file changes with StatReloader
+2026-01-31 15:31:31,717 [INFO] django.utils.autoreload: /Users/apple/Desktop/WAPANGAJI/home/views.py changed, reloading.
+2026-01-31 15:31:32,124 [INFO] django.utils.autoreload: Watching for file changes with StatReloader
+2026-01-31 15:31:50,629 [INFO] django.utils.autoreload: /Users/apple/Desktop/WAPANGAJI/home/views.py changed, reloading.
+2026-01-31 15:31:51,079 [INFO] django.utils.autoreload: Watching for file changes with StatReloader
+2026-01-31 15:31:56,400 [INFO] django.utils.autoreload: /Users/apple/Desktop/WAPANGAJI/home/urls.py changed, reloading.
+2026-01-31 15:31:56,806 [INFO] django.utils.autoreload: Watching for file changes with StatReloader
+2026-01-31 15:32:12,193 [ERROR] django.security.DisallowedHost: Invalid HTTP_HOST header: 'testserver'. You may need to add 'testserver' to ALLOWED_HOSTS.
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/django/utils/deprecation.py", line 119, in __call__
+    response = self.process_request(request)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/django/middleware/common.py", line 48, in process_request
+    host = request.get_host()
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/django/http/request.py", line 186, in get_host
+    raise DisallowedHost(msg)
+django.core.exceptions.DisallowedHost: Invalid HTTP_HOST header: 'testserver'. You may need to add 'testserver' to ALLOWED_HOSTS.
+2026-01-31 15:32:44,751 [INFO] django.utils.autoreload: /Users/apple/Desktop/WAPANGAJI/home/views.py changed, reloading.
+2026-01-31 15:32:45,158 [INFO] django.utils.autoreload: Watching for file changes with StatReloader
+2026-01-31 15:32:53,498 [INFO] django.utils.autoreload: /Users/apple/Desktop/WAPANGAJI/home/views.py changed, reloading.
+2026-01-31 15:32:53,953 [INFO] django.utils.autoreload: Watching for file changes with StatReloader
+2026-01-31 15:34:48,986 [INFO] django.utils.autoreload: /Users/apple/Desktop/WAPANGAJI/home/views.py changed, reloading.
+2026-01-31 15:34:49,378 [INFO] django.utils.autoreload: Watching for file changes with StatReloader
+2026-02-05 21:19:28,788 [INFO] django.utils.autoreload: Watching for file changes with StatReloader
+2026-02-05 21:19:38,214 [ERROR] django.request: Internal Server Error: /accounts/login/
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/django/core/handlers/base.py", line 220, in _get_response
+    response = response.render()
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/django/template/response.py", line 114, in render
+    self.content = self.rendered_content
+                   ^^^^^^^^^^^^^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/django/template/response.py", line 90, in rendered_content
+    template = self.resolve_template(self.template_name)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/django/template/response.py", line 72, in resolve_template
+    return select_template(template, using=self.using)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/django/template/loader.py", line 47, in select_template
+    raise TemplateDoesNotExist(", ".join(template_name_list), chain=chain)
+django.template.exceptions.TemplateDoesNotExist: registration/login.html
+2026-02-10 10:09:39,292 [INFO] django.utils.autoreload: Watching for file changes with StatReloader
+2026-02-11 14:05:55,366 [INFO] django.utils.autoreload: Watching for file changes with StatReloader
+2026-02-11 14:06:21,860 [ERROR] django.request: Internal Server Error: /users/register/
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/django/core/handlers/base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/django/contrib/auth/decorators.py", line 59, in _view_wrapper
+    return view_func(request, *args, **kwargs)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/django/views/decorators/http.py", line 64, in inner
+    return func(request, *args, **kwargs)
+  File "/Users/apple/Desktop/WAPANGAJI/users/views.py", line 45, in register
+    return render(request, 'users/register.html', {'form': form})
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/django/shortcuts.py", line 25, in render
+    content = loader.render_to_string(template_name, context, request, using=using)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/django/template/loader.py", line 61, in render_to_string
+    template = get_template(template_name, using=using)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/django/template/loader.py", line 19, in get_template
+    raise TemplateDoesNotExist(template_name, chain=chain)
+django.template.exceptions.TemplateDoesNotExist: users/register.html
+2026-02-11 14:06:48,460 [ERROR] django.request: Internal Server Error: /users/register/
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/django/core/handlers/base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/django/contrib/auth/decorators.py", line 59, in _view_wrapper
+    return view_func(request, *args, **kwargs)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/django/views/decorators/http.py", line 64, in inner
+    return func(request, *args, **kwargs)
+  File "/Users/apple/Desktop/WAPANGAJI/users/views.py", line 45, in register
+    return render(request, 'users/register.html', {'form': form})
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/django/shortcuts.py", line 25, in render
+    content = loader.render_to_string(template_name, context, request, using=using)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/django/template/loader.py", line 61, in render_to_string
+    template = get_template(template_name, using=using)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/django/template/loader.py", line 19, in get_template
+    raise TemplateDoesNotExist(template_name, chain=chain)
+django.template.exceptions.TemplateDoesNotExist: users/register.html
+2026-02-15 14:20:07,653 [INFO] django.utils.autoreload: Watching for file changes with StatReloader
+2026-02-15 14:22:09,625 [ERROR] django.request: Internal Server Error: /users/register/
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/django/core/handlers/base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/django/contrib/auth/decorators.py", line 59, in _view_wrapper
+    return view_func(request, *args, **kwargs)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/django/views/decorators/http.py", line 64, in inner
+    return func(request, *args, **kwargs)
+  File "/Users/apple/Desktop/WAPANGAJI/users/views.py", line 45, in register
+    return render(request, 'users/register.html', {'form': form})
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/django/shortcuts.py", line 25, in render
+    content = loader.render_to_string(template_name, context, request, using=using)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/django/template/loader.py", line 61, in render_to_string
+    template = get_template(template_name, using=using)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/django/template/loader.py", line 19, in get_template
+    raise TemplateDoesNotExist(template_name, chain=chain)
+django.template.exceptions.TemplateDoesNotExist: users/register.html
+2026-02-16 10:25:51,859 [INFO] django.utils.autoreload: Watching for file changes with StatReloader
+2026-02-16 11:53:26,987 [ERROR] django.request: Internal Server Error: /landlord/settings/
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/django/template/base.py", line 510, in parse
+    compile_func = self.tags[command]
+                   ~~~~~~~~~^^^^^^^^^
+KeyError: 'endif'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/django/core/handlers/base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/django/contrib/auth/decorators.py", line 59, in _view_wrapper
+    return view_func(request, *args, **kwargs)
+  File "/Users/apple/Desktop/WAPANGAJI/landlord/views.py", line 454, in settings
+    return render(request, 'landlord/settings.html', context)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/django/shortcuts.py", line 25, in render
+    content = loader.render_to_string(template_name, context, request, using=using)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/django/template/loader.py", line 61, in render_to_string
+    template = get_template(template_name, using=using)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/django/template/loader.py", line 15, in get_template
+    return engine.get_template(template_name)
+           ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/django/template/backends/django.py", line 79, in get_template
+    return Template(self.engine.get_template(template_name), self)
+                    ~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/django/template/engine.py", line 177, in get_template
+    template, origin = self.find_template(template_name)
+                       ~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/django/template/engine.py", line 159, in find_template
+    template = loader.get_template(name, skip=skip)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/django/template/loaders/cached.py", line 57, in get_template
+    template = super().get_template(template_name, skip)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/django/template/loaders/base.py", line 28, in get_template
+    return Template(
+        contents,
+    ...<2 lines>...
+        self.engine,
+    )
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/django/template/base.py", line 154, in __init__
+    self.nodelist = self.compile_nodelist()
+                    ~~~~~~~~~~~~~~~~~~~~~^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/django/template/base.py", line 196, in compile_nodelist
+    nodelist = parser.parse()
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/django/template/base.py", line 518, in parse
+    raise self.error(token, e)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/django/template/base.py", line 516, in parse
+    compiled_result = compile_func(self, token)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/django/template/loader_tags.py", line 299, in do_extends
+    nodelist = parser.parse()
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/django/template/base.py", line 518, in parse
+    raise self.error(token, e)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/django/template/base.py", line 516, in parse
+    compiled_result = compile_func(self, token)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/django/template/loader_tags.py", line 234, in do_block
+    nodelist = parser.parse(("endblock",))
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/django/template/base.py", line 518, in parse
+    raise self.error(token, e)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/django/template/base.py", line 516, in parse
+    compiled_result = compile_func(self, token)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/django/template/defaulttags.py", line 862, in do_for
+    nodelist_loop = parser.parse(
+        (
+    ...<2 lines>...
+        )
+    )
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/django/template/base.py", line 512, in parse
+    self.invalid_block_tag(token, command, parse_until)
+    ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/django/template/base.py", line 567, in invalid_block_tag
+    raise self.error(
+    ...<8 lines>...
+    )
+django.template.exceptions.TemplateSyntaxError: Invalid block tag on line 175: 'endif', expected 'empty' or 'endfor'. Did you forget to register or load this tag?
+2026-02-16 13:02:07,938 [INFO] django.utils.autoreload: /Users/apple/Desktop/WAPANGAJI/tenancy/views.py changed, reloading.
+2026-02-16 13:02:08,768 [INFO] django.utils.autoreload: Watching for file changes with StatReloader
+2026-02-16 13:02:13,282 [INFO] django.utils.autoreload: /Users/apple/Desktop/WAPANGAJI/tenancy/views.py changed, reloading.
+2026-02-16 13:02:13,822 [INFO] django.utils.autoreload: Watching for file changes with StatReloader
+2026-02-16 13:02:25,295 [INFO] django.utils.autoreload: /Users/apple/Desktop/WAPANGAJI/tenancy/views.py changed, reloading.
+2026-02-16 13:02:25,823 [INFO] django.utils.autoreload: Watching for file changes with StatReloader
+2026-02-16 13:03:07,811 [INFO] django.utils.autoreload: /Users/apple/Desktop/WAPANGAJI/tenancy/views.py changed, reloading.
+2026-02-16 13:03:08,348 [INFO] django.utils.autoreload: Watching for file changes with StatReloader
+2026-02-16 13:03:14,725 [INFO] django.utils.autoreload: /Users/apple/Desktop/WAPANGAJI/tenancy/views.py changed, reloading.
+2026-02-16 13:03:15,270 [INFO] django.utils.autoreload: Watching for file changes with StatReloader
+2026-02-16 13:03:22,677 [INFO] django.utils.autoreload: /Users/apple/Desktop/WAPANGAJI/tenancy/views.py changed, reloading.
+2026-02-16 13:03:23,113 [INFO] django.utils.autoreload: Watching for file changes with StatReloader
+2026-02-16 13:03:32,519 [INFO] django.utils.autoreload: /Users/apple/Desktop/WAPANGAJI/tenancy/views.py changed, reloading.
+2026-02-16 13:03:33,143 [INFO] django.utils.autoreload: Watching for file changes with StatReloader
+2026-02-16 15:14:17,212 [INFO] django.utils.autoreload: /Users/apple/Desktop/WAPANGAJI/wapangaji/settings.py changed, reloading.
+2026-02-16 15:26:47,964 [INFO] django.utils.autoreload: Watching for file changes with StatReloader
+2026-02-18 13:48:56,745 [INFO] django.utils.autoreload: Watching for file changes with StatReloader
+2026-02-18 14:06:22,596 [INFO] django.utils.autoreload: Watching for file changes with StatReloader

@@ -1,0 +1,82 @@
+{% extends 'landlord/landlord_base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h4 class="mb-0">Edit Unit {{ unit.unit_number }}</h4>
+                    <a href="{% url 'properties:property_detail' unit.property.id %}" class="btn btn-sm btn-outline-secondary">
+                        <i class="ri-arrow-left-line"></i> Back to Property
+                    </a>
+                </div>
+                <div class="card-body">
+                    <form method="post">
+                        {% csrf_token %}
+                        <div class="mb-3">
+                            <label for="unit_number" class="form-label">Unit Number</label>
+                            <input type="text" class="form-control" id="unit_number" name="unit_number" 
+                                   value="{{ unit.unit_number }}" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="rent_amount" class="form-label">Rent Amount (TZS)</label>
+                            <input type="number" class="form-control" id="rent_amount" name="rent_amount" 
+                                   value="{{ unit.rent_amount }}" step="0.01" required>
+                        </div>
+                        <div class="mb-3 form-check">
+                            <input type="checkbox" class="form-check-input" id="is_occupied" 
+                                   name="is_occupied" {% if unit.is_occupied %}checked{% endif %}>
+                            <label class="form-check-label" for="is_occupied">Occupied</label>
+                        </div>
+                        <div class="d-flex justify-content-between">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="ri-save-line me-1"></i> Save Changes
+                            </button>
+                            <button type="button" class="btn btn-danger" data-bs-toggle="modal" 
+                                    data-bs-target="#deleteModal">
+                                <i class="ri-delete-bin-line me-1"></i> Delete Unit
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Delete Confirmation Modal -->
+<div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="deleteModalLabel">Confirm Deletion</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                Are you sure you want to delete unit {{ unit.unit_number }}? This action cannot be undone.
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <form action="{% url 'properties:delete_unit' unit.id %}" method="post" class="d-inline">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-danger">
+                        <i class="ri-delete-bin-line me-1"></i> Delete Unit
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// Initialize tooltips
+var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
+var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+    return new bootstrap.Tooltip(tooltipTriggerEl)
+});
+</script>
+{% endblock %}

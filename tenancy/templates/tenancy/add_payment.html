@@ -1,0 +1,370 @@
+{% extends 'tenancy/tenant_base.html' %}
+{% load static %}
+{% load crispy_forms_tags %}
+
+{% block title %}Record Payment - {{ tenancy.tenant.get_full_name|default:tenancy.tenant.username }}{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h1><i class="fas fa-money-bill-wave me-2"></i>Record Payment</h1>
+            <p class="text-muted mb-0">Complete your rent payment easily</p>
+        </div>
+        <a href="{% url 'tenancy:payment_history' %}" class="btn btn-outline-secondary">
+            <i class="fas fa-arrow-left me-1"></i> Back to Payments
+        </a>
+    </div>
+
+    <!-- Property Info -->
+    <div class="card shadow mb-4">
+        <div class="card-body">
+            <div class="d-flex align-items-center">
+                <div class="me-4">
+                    <i class="fas fa-building fa-2x text-primary"></i>
+                </div>
+                <div>
+                    <h5 class="mb-1">{{ property.name }}</h5>
+                    <p class="text-muted mb-1">
+                        <i class="fas fa-map-marker-alt me-1"></i> {{ unit.unit_number }} • {{ property.address }}
+                    </p>
+                    <p class="mb-0">
+                        <strong>Rent Amount:</strong> TZS {{ property.rent|default:"0"|floatformat:2 }}
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Payment Methods Section -->
+    <div class="card shadow mb-4">
+        <div class="card-header py-3">
+            <h6 class="m-0 font-weight-bold text-primary">
+                <i class="fas fa-wallet me-1"></i> Choose Payment Method
+            </h6>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <!-- M-PESA -->
+                <div class="col-md-6 mb-4">
+                    <div class="payment-method-card" onclick="selectMethod(this, 'mpesa')">
+                        <div class="method-icon">
+                            <a href="https://www.safaricom.co.tz/personal/mpesa" target="_blank" rel="noopener noreferrer">
+                                <img src="{% static 'img/payments/mpesa.svg' %}" alt="M-PESA" class="method-logo" />
+                            </a>
+                        </div>
+                        <div class="method-name">M-PESA <a href="https://www.safaricom.co.tz/personal/mpesa" target="_blank" rel="noopener noreferrer" class="ms-2 small text-muted">(info)</a></div>
+                        <p class="text-muted mb-2">Fast mobile money transfer</p>
+                        <div class="method-code">13423</div>
+                        <small class="text-muted">Business/Till Number</small>
+                    </div>
+                </div>
+
+                <!-- HALOPESA -->
+                <div class="col-md-6 mb-4">
+                    <div class="payment-method-card" onclick="selectMethod(this, 'halopesa')">
+                        <div class="method-icon">
+                            <a href="https://halopesa.co.tz" target="_blank" rel="noopener noreferrer">
+                                <img src="{% static 'img/payments/halopesa.svg' %}" alt="HaloPesa" class="method-logo" />
+                            </a>
+                        </div>
+                        <div class="method-name">HALOPESA <a href="https://halopesa.co.tz" target="_blank" rel="noopener noreferrer" class="ms-2 small text-muted">(info)</a></div>
+                        <p class="text-muted mb-2">Fast online money transfer</p>
+                        <div class="method-code">32423</div>
+                        <small class="text-muted">Account Number</small>
+                    </div>
+                </div>
+
+                <!-- NMB Bank -->
+                <div class="col-md-6 mb-4">
+                    <div class="payment-method-card" onclick="selectMethod(this, 'nbm')">
+                        <div class="method-icon">
+                            <a href="https://www.nmbbank.co.tz" target="_blank" rel="noopener noreferrer">
+                                <img src="{% static 'img/payments/nmb.svg' %}" alt="NMB Bank" class="method-logo" />
+                            </a>
+                        </div>
+                        <div class="method-name">NMB Bank <a href="https://www.nmbbank.co.tz" target="_blank" rel="noopener noreferrer" class="ms-2 small text-muted">(info)</a></div>
+                        <p class="text-muted mb-2">Direct bank transfer</p>
+                        <div class="method-code">32423245232523</div>
+                        <small class="text-muted">Account Number</small>
+                    </div>
+                </div>
+
+                <!-- CRDB Bank -->
+                <div class="col-md-6 mb-4">
+                    <div class="payment-method-card" onclick="selectMethod(this, 'crdb')">
+                        <div class="method-icon">
+                            <a href="https://www.crdbbank.co.tz" target="_blank" rel="noopener noreferrer">
+                                <img src="{% static 'img/payments/crdb.svg' %}" alt="CRDB Bank" class="method-logo" />
+                            </a>
+                        </div>
+                        <div class="method-name">CRDB Bank <a href="https://www.crdbbank.co.tz" target="_blank" rel="noopener noreferrer" class="ms-2 small text-muted">(info)</a></div>
+                        <p class="text-muted mb-2">Direct bank transfer</p>
+                        <div class="method-code">32423242324242</div>
+                        <small class="text-muted">Account Number</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Back to Payment History -->
+    <div class="card shadow mb-4">
+        <div class="card-body text-center">
+            <a href="{% url 'tenancy:payment_history' %}" class="btn btn-outline-primary">
+                <i class="fas fa-history me-1"></i> Check Payment History
+            </a>
+        </div>
+    </div>
+
+    <!-- Instructions -->
+    <div class="card shadow mb-4">
+        <div class="card-header py-3">
+            <h6 class="m-0 font-weight-bold text-primary">
+                <i class="fas fa-list-check me-1"></i> How to Send Payment
+            </h6>
+        </div>
+        <div class="card-body">
+            <ol class="mb-0">
+                <li class="mb-2"><strong>Choose a payment method</strong> from the options above</li>
+                <li class="mb-2"><strong>Copy the account/till number</strong> and use it to send your rent payment</li>
+                <li class="mb-2"><strong>Enter the payment details</strong> in the form below</li>
+                <li class="mb-2"><strong>Upload a screenshot or receipt</strong> of the payment confirmation</li>
+                <li class="mb-2"><strong>Click Save Payment</strong> to complete the process</li>
+            </ol>
+        </div>
+    </div>
+</div>
+
+<style>
+/* Payment Method Cards */
+.payment-method-card {
+    background: white;
+    border: 2px solid #e2e8f0;
+    border-radius: 12px;
+    padding: 1.5rem;
+    height: 100%;
+    transition: all 0.3s ease;
+    cursor: pointer;
+}
+
+.payment-method-card:hover {
+    border-color: #4e73df;
+    box-shadow: 0 4px 12px rgba(78, 115, 223, 0.15);
+    transform: translateY(-2px);
+}
+
+.payment-method-card.selected {
+    border-color: #4e73df;
+    background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
+}
+
+.method-icon {
+    font-size: 2rem;
+    color: #4e73df;
+    margin-bottom: 0.75rem;
+}
+
+.method-logo { width:56px; height:56px; object-fit:contain; display:block }
+    margin-bottom: 0.5rem;
+}
+
+.method-code {
+    font-family: 'Courier New', monospace;
+    font-size: 1.1rem;
+    font-weight: 800;
+    color: #4e73df;
+    background: #f1f5f9;
+    padding: 0.5rem;
+    border-radius: 6px;
+    text-align: center;
+    margin: 1rem 0;
+    user-select: all;
+}
+
+/* Custom styles to match notifications page */
+.border-left-primary {
+    border-left: 0.25rem solid #4e73df !important;
+}
+.border-left-warning {
+    border-left: 0.25rem solid #f6c23e !important;
+}
+.border-left-success {
+    border-left: 0.25rem solid #1cc88a !important;
+}
+
+/* Form styling */
+.form-control:focus, .form-select:focus {
+    border-color: #4e73df;
+    box-shadow: 0 0 0 0.2rem rgba(78, 115, 223, 0.25);
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .card {
+        margin-bottom: 1rem;
+    }
+    
+    .btn {
+        width: 100%;
+        margin-bottom: 0.5rem;
+    }
+    
+    .d-flex {
+        flex-direction: column;
+    }
+    
+    .me-2 {
+        margin-right: 0 !important;
+        margin-bottom: 0.5rem;
+    }
+    
+    .payment-method-card {
+        margin-bottom: 1rem;
+    }
+}
+</style>
+
+<script>
+function selectMethod(element, method) {
+    // Remove selected class from all cards
+    document.querySelectorAll('.payment-method-card').forEach(card => {
+        card.classList.remove('selected');
+    });
+    
+    // Add selected class to clicked card
+    element.classList.add('selected');
+    
+    // Update the hidden payment method field
+    const methodField = document.getElementById('payment_method');
+    if (methodField) {
+        // Map the method to the correct format
+        const methodMap = {
+            'mpesa': 'M-Pesa',
+            'halopesa': 'HaloPesa',
+            'nbm': 'NMB Bank',
+            'crdb': 'CRDB Bank'
+        };
+        methodField.value = methodMap[method] || 'M-Pesa';
+    }
+}
+</script>
+{% endblock %}
+                        <div class="payment-method-card" onclick="selectMethod(this, 'halopesa')">
+                            <div class="method-icon">
+                                <i class="fas fa-mobile-alt"></i>
+                            </div>
+                            <div class="method-name">HALOPESA</div>
+                            <p class="text-muted mb-2">Fast online money transfer</p>
+                            <div class="method-code">32423</div>
+                            <small class="text-muted">Account Number</small>
+                        </div>
+                    </div>
+
+                    <!-- NBM Bank -->
+                    <div class="col-md-6">
+                        <div class="payment-method-card" onclick="selectMethod(this, 'nbm')">
+                            <div class="method-icon">
+                                <i class="fas fa-university"></i>
+                            </div>
+                            <div class="method-name">NBM Bank</div>
+                            <p class="text-muted mb-2">Direct bank transfer</p>
+                            <div class="method-code">32423245232523</div>
+                            <small class="text-muted">Account Number</small>
+                        </div>
+                    </div>
+
+                    <!-- CRDB Bank -->
+                    <div class="col-md-6">
+                        <div class="payment-method-card" onclick="selectMethod(this, 'crdb')">
+                            <div class="method-icon">
+                                <i class="fas fa-university"></i>
+                            </div>
+                            <div class="method-name">CRDB Bank</div>
+                            <p class="text-muted mb-2">Direct bank transfer</p>
+                            <div class="method-code">32423242324242</div>
+                            <small class="text-muted">Account Number</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Instructions -->
+            <div class="instructions-box">
+                <h5><i class="fas fa-list-check"></i> How to Send Payment</h5>
+                <ol>
+                    <li><strong>Choose a payment method</strong> from the options above</li>
+                    <li><strong>Copy the account/till number</strong> and use it to send your rent payment</li>
+                    <li><strong>Send the exact amount</strong> of rent due</li>
+                    <li><strong>Take a screenshot</strong> of the successful transaction confirmation</li>
+                    <li><strong>Send the screenshot</strong> along with your payment details to our support team</li>
+                </ol>
+            </div>
+
+            <!-- Contact Information -->
+            <div class="contact-info">
+                <h5><i class="fas fa-phone-alt"></i> Send Payment Confirmation</h5>
+                <p class="mb-3">After making the payment, please send:</p>
+                <ul style="margin-bottom: 1.5rem; color: #92400e;">
+                    <li>Payment screenshot/receipt</li>
+                    <li>Payment method used</li>
+                    <li>Transaction reference (if available)</li>
+                </ul>
+                <p style="margin-bottom: 0.5rem; color: #92400e;"><strong>To this number:</strong></p>
+                <div class="contact-phone">
+                    <i class="fas fa-whatsapp" style="color: #16a34a;"></i> 0762526225225
+                </div>
+                <p style="margin-top: 1rem; font-size: 0.9rem; color: #92400e; margin-bottom: 0;">
+                    <i class="fas fa-info-circle"></i> You can send via WhatsApp, SMS, or call
+                </p>
+            </div>
+
+            <!-- Success Message Section -->
+            <div style="background: white; border-radius: 14px; padding: 2rem; box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08); margin-top: 2rem; text-align: center; border: 1px solid #e2e8f0;">
+                <h5 style="color: #0f172a; font-weight: 700; margin-bottom: 1rem;">
+                    <i class="fas fa-check-circle" style="color: #16a34a;"></i> Thank You!
+                </h5>
+                <p style="color: #334155; margin-bottom: 1.5rem;">
+                    We appreciate your timely payment. Once we receive and verify your payment confirmation, we'll update your account immediately.
+                </p>
+                <div style="display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;">
+                    <a href="{% url 'tenancy:payment_history' %}" class="btn" style="background: linear-gradient(135deg, #2563eb 0%, #1e40af 100%); color: white; border: none; padding: 0.85rem 2rem; border-radius: 10px; font-weight: 700; text-decoration: none;">
+                        <i class="fas fa-history"></i> View Payment History
+                    </a>
+                    <a href="{% url 'tenancy:tenant_dashboard' %}" class="btn" style="background: #f1f5f9; color: #334155; border: 2px solid #e2e8f0; padding: 0.85rem 2rem; border-radius: 10px; font-weight: 700; text-decoration: none;">
+                        <i class="fas fa-home"></i> Back to Dashboard
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+                        
+                        <div class="d-flex justify-content-between mt-4">
+                            <a href="{% url 'tenancy:payment_history' %}" class="btn btn-secondary">
+                                <i class="fas fa-arrow-left me-2"></i> Back to Payments
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        function selectMethod(element, method) {
+            // Remove selected class from all cards
+            document.querySelectorAll('.payment-method-card').forEach(card => {
+                card.classList.remove('selected');
+            });
+            
+            // Add selected class to clicked card
+            element.classList.add('selected');
+            
+            // Store selected method
+            console.log('Selected payment method:', method);
+        }
+    </script>
+</body>
+</html>

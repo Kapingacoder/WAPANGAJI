@@ -1,0 +1,180 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Maintenance Requests - WAPANGAJI</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'tenancy/style.css' %}">
+    <style>
+        /* =============================
+           Maintenance Page Custom CSS
+           ============================= */
+        .maintenance-summary {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            background: var(--bg-secondary);
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-md);
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .summary-item {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--primary-color);
+            margin-right: 1.5rem;
+        }
+        .summary-status {
+            font-size: 1rem;
+            font-weight: 500;
+            color: var(--text-secondary);
+            margin-right: 1rem;
+        }
+        .add-request-btn {
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+            color: #fff;
+            border: none;
+            border-radius: var(--radius-md);
+            padding: 0.75rem 2rem;
+            font-size: 1rem;
+            font-weight: 600;
+            box-shadow: var(--shadow-md);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .add-request-btn:hover {
+            background: var(--primary-dark);
+            box-shadow: var(--shadow-lg);
+        }
+        .maintenance-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 2rem;
+        }
+        .maintenance-card {
+            background: var(--bg-primary);
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-md);
+            padding: 1.5rem;
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            position: relative;
+        }
+        .maintenance-card .card-title {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: var(--primary-color);
+        }
+        .maintenance-card .card-date {
+            font-size: 0.95rem;
+            color: var(--text-secondary);
+        }
+        .maintenance-card .card-status {
+            font-size: 0.95rem;
+            font-weight: 600;
+            border-radius: 5px;
+            padding: 0.3rem 1rem;
+            display: inline-block;
+        }
+        .status-pending {
+            background: #fef3c7;
+            color: #78350f;
+        }
+        .status-inprogress {
+            background: #dbeafe;
+            color: #1e40af;
+        }
+        .status-completed {
+            background: #d1fae5;
+            color: #065f46;
+        }
+        .maintenance-card .card-actions {
+            margin-top: 1rem;
+        }
+        .view-details-btn {
+            background: var(--accent-color);
+            color: #fff;
+            border: none;
+            border-radius: var(--radius-md);
+            padding: 0.5rem 1.5rem;
+            font-size: 0.95rem;
+            font-weight: 600;
+            box-shadow: var(--shadow-sm);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .view-details-btn:hover {
+            background: #f59e0b;
+            box-shadow: var(--shadow-md);
+        }
+        /* Responsive: stack cards vertically on mobile */
+        @media (max-width: 600px) {
+            .maintenance-summary {
+                flex-direction: column;
+                gap: 1rem;
+                align-items: flex-start;
+            }
+            .maintenance-cards {
+                grid-template-columns: 1fr;
+                gap: 1.2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="header-container">
+            <div class="logo">
+                <i class="fas fa-user-tie"></i>
+                <span>WAPANGAJI Tenant</span>
+            </div>
+            <nav class="nav">
+                <a href="{% url 'tenancy:tenant_dashboard' %}" class="nav-link">Dashboard</a>
+                <a href="{% url 'tenancy:messages_list' %}" class="nav-link">Messages</a>
+                <a href="{% url 'home:index' %}" class="nav-link">Home</a>
+            </nav>
+        </div>
+    </header>
+    <main class="main-content">
+        <div class="page-header">
+            <h1><i class="fas fa-tools"></i> Maintenance Requests</h1>
+        </div>
+        <!-- Summary / Actions -->
+        <section class="maintenance-summary">
+            <span class="summary-item">Total Requests: {{ total_requests }}</span>
+            <span class="summary-status">Pending: {{ pending_count }}</span>
+            <span class="summary-status">In Progress: {{ inprogress_count }}</span>
+            <span class="summary-status">Completed: {{ completed_count }}</span>
+            <a href="{% url 'tenancy:add_maintenance_request' %}" class="add-request-btn"><i class="fas fa-plus"></i> Add New Request</a>
+        </section>
+        <!-- Maintenance Request Cards -->
+        <section class="maintenance-cards">
+            {% for request in maintenance_requests %}
+            <div class="maintenance-card">
+                <div class="card-title">{{ request.title }}</div>
+                <div class="card-date">Submitted: {{ request.submitted_at|date:"d M Y" }}</div>
+                <div class="card-status status-{{ request.status|lower|cut:' ' }}">{{ request.status }}</div>
+                <div class="card-actions">
+                    <a href="{% url 'tenancy:maintenance_detail' request.id %}" class="view-details-btn">View Details</a>
+                </div>
+            </div>
+            {% empty %}
+            <div class="maintenance-card">
+                <div class="card-title">No requests found</div>
+                <div class="card-date">You have not submitted any maintenance requests yet.</div>
+            </div>
+            {% endfor %}
+        </section>
+    </main>
+    <footer class="footer">
+        <p>&copy; 2025 WAPANGAJI. All Rights Reserved.</p>
+    </footer>
+</body>
+</html>

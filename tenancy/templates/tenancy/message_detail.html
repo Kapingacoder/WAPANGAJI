@@ -1,0 +1,362 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Message Details - WAPANGAJI</title>
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'tenancy/style.css' %}">
+    <style>
+        .message-hero {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 2rem;
+            border-radius: 1.5rem;
+            margin-bottom: 2rem;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .message-hero::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grain" width="100" height="100" patternUnits="userSpaceOnUse"><circle cx="25" cy="25" r="1" fill="rgba(255,255,255,0.1)"/><circle cx="75" cy="75" r="1" fill="rgba(255,255,255,0.1)"/><circle cx="50" cy="50" r="1" fill="rgba(255,255,255,0.05)"/></pattern></defs><rect width="100" height="100" fill="url(%23grain)"/></svg>');
+            animation: float 20s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translate(0, 0) rotate(0deg); }
+            33% { transform: translate(30px, -30px) rotate(120deg); }
+            66% { transform: translate(-20px, 20px) rotate(240deg); }
+        }
+
+        .message-hero h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            position: relative;
+            z-index: 1;
+        }
+
+        .message-hero p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+            position: relative;
+            z-index: 1;
+        }
+
+        .message-content-card {
+            background: white;
+            border-radius: 1.25rem;
+            padding: 2.5rem;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            margin-bottom: 2rem;
+        }
+
+        .message-header-enhanced {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 2rem;
+            padding-bottom: 2rem;
+            border-bottom: 2px solid #f0f5ff;
+            flex-wrap: wrap;
+            gap: 2rem;
+        }
+
+        .sender-profile {
+            display: flex;
+            gap: 1.5rem;
+            align-items: center;
+        }
+
+        .sender-avatar {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 2rem;
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
+        }
+
+        .sender-info h2 {
+            font-size: 1.75rem;
+            color: #1e293b;
+            margin-bottom: 0.5rem;
+            font-weight: 700;
+        }
+
+        .sender-details {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .sender-detail {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            color: #64748b;
+            font-size: 0.95rem;
+        }
+
+        .sender-detail i {
+            color: #667eea;
+            width: 16px;
+        }
+
+        .message-timestamp {
+            text-align: right;
+            color: #64748b;
+        }
+
+        .timestamp-item {
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            gap: 0.5rem;
+            margin-bottom: 0.5rem;
+            font-size: 0.9rem;
+        }
+
+        .timestamp-item i {
+            color: #667eea;
+            width: 14px;
+        }
+
+        .read-indicator {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 1rem;
+            border-radius: 50px;
+            font-weight: 600;
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .read-indicator.read {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            color: white;
+        }
+
+        .read-indicator.unread {
+            background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+            color: white;
+        }
+
+        .message-body-section {
+            margin: 2rem 0;
+        }
+
+        .message-subject {
+            font-size: 1.5rem;
+            color: #1e293b;
+            margin-bottom: 1.5rem;
+            font-weight: 700;
+            line-height: 1.3;
+        }
+
+        .message-body {
+            color: #475569;
+            line-height: 1.8;
+            font-size: 1.1rem;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            background: #f8fafc;
+            padding: 2rem;
+            border-radius: 1rem;
+            border-left: 4px solid #667eea;
+        }
+
+        .message-actions-enhanced {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            margin-top: 2rem;
+            flex-wrap: wrap;
+        }
+
+        .action-btn {
+            padding: 1rem 2rem;
+            border-radius: 50px;
+            font-weight: 600;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.75rem;
+            transition: all 0.3s ease;
+            font-size: 1rem;
+            border: 2px solid transparent;
+        }
+
+        .action-btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .action-btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
+        }
+
+        .action-btn-secondary {
+            background: white;
+            color: #64748b;
+            border-color: #e2e8f0;
+        }
+
+        .action-btn-secondary:hover {
+            background: #f8fafc;
+            border-color: #667eea;
+            color: #667eea;
+            transform: translateY(-2px);
+        }
+
+        @media (max-width: 768px) {
+            .message-hero h1 {
+                font-size: 2rem;
+            }
+
+            .message-header-enhanced {
+                flex-direction: column;
+                text-align: center;
+            }
+
+            .message-timestamp {
+                text-align: center;
+            }
+
+            .timestamp-item {
+                justify-content: center;
+            }
+
+            .message-body {
+                padding: 1.5rem;
+            }
+
+            .message-actions-enhanced {
+                flex-direction: column;
+            }
+
+            .action-btn {
+                width: 100%;
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="header-container">
+            <div class="logo">
+                <i class="fas fa-user-tie"></i>
+                <span>WAPANGAJI Tenant</span>
+            </div>
+            <nav class="nav">
+                <a href="{% url 'tenancy:tenant_dashboard' %}" class="nav-link">Dashboard</a>
+                <a href="{% url 'tenancy:messages_list' %}" class="nav-link active">Messages</a>
+                <a href="/" class="nav-link">Home</a>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <div class="page-header">
+            <a href="{% url 'tenancy:messages_list' %}" class="back-link">
+                <i class="fas fa-arrow-left"></i> Back to Messages
+            </a>
+        </div>
+
+        <!-- Hero Section -->
+        <div class="message-hero">
+            <h1><i class="fas fa-envelope-open"></i> Message Details</h1>
+            <p>Read and respond to your messages</p>
+        </div>
+
+        <div class="message-content-card">
+            <!-- Message Header -->
+            <div class="message-header-enhanced">
+                <div class="sender-profile">
+                    <div class="sender-avatar">
+                        <i class="fas fa-user"></i>
+                    </div>
+                    <div class="sender-info">
+                        <h2>{{ message.sender.first_name }} {{ message.sender.last_name }}</h2>
+                        <div class="sender-details">
+                            <div class="sender-detail">
+                                <i class="fas fa-envelope"></i>
+                                {{ message.sender.email }}
+                            </div>
+                            {% if message.sender.phone %}
+                                <div class="sender-detail">
+                                    <i class="fas fa-phone"></i>
+                                    {{ message.sender.phone }}
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+
+                <div class="message-timestamp">
+                    <div class="timestamp-item">
+                        <i class="fas fa-calendar"></i>
+                        {{ message.sent_at|date:"l, F d, Y" }}
+                    </div>
+                    <div class="timestamp-item">
+                        <i class="fas fa-clock"></i>
+                        {{ message.sent_at|date:"H:i A" }}
+                    </div>
+                    {% if message.read_at %}
+                        <div class="read-indicator read">
+                            <i class="fas fa-check-double"></i> Read
+                        </div>
+                    {% else %}
+                        <div class="read-indicator unread">
+                            <i class="fas fa-envelope"></i> Unread
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Message Content -->
+            <div class="message-body-section">
+                <h3 class="message-subject">{{ message.subject }}</h3>
+                <div class="message-body">
+                    {{ message.body|linebreaks }}
+                </div>
+            </div>
+
+            <!-- Message Actions -->
+            <div class="message-actions-enhanced">
+                <a href="{% url 'tenancy:send_message' %}" class="action-btn action-btn-primary">
+                    <i class="fas fa-reply"></i> Reply to Message
+                </a>
+                <a href="{% url 'tenancy:messages_list' %}" class="action-btn action-btn-secondary">
+                    <i class="fas fa-arrow-left"></i> Back to Messages
+                </a>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <p>&copy; 2025 WAPANGAJI. All Rights Reserved.</p>
+    </footer>
+</body>
+</html>

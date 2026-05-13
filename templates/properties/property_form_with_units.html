@@ -1,0 +1,402 @@
+{% extends 'landlord/landlord_base.html' %}
+{% load static %}
+
+{% block extra_css %}
+<style>
+    .form-section {
+        background: #fff;
+        border-radius: 0.5rem;
+        padding: 2rem;
+        margin-bottom: 2rem;
+        box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+    }
+    .form-section h4 {
+        color: #3b7ddd;
+        margin-bottom: 1.5rem;
+        padding-bottom: 0.75rem;
+        border-bottom: 1px solid #dee2e6;
+    }
+    .unit-card {
+        background: #f8f9fa;
+        border: 1px solid #dee2e6;
+        border-radius: 0.5rem;
+        padding: 1.5rem;
+        margin-bottom: 1.5rem;
+        position: relative;
+    }
+    .remove-unit {
+        position: absolute;
+        top: 1rem;
+        right: 1rem;
+        color: #dc3545;
+        cursor: pointer;
+    }
+    .add-unit-btn {
+        margin-bottom: 1.5rem;
+    }
+    .form-label {
+        font-weight: 500;
+    }
+    .required-field:after {
+        content: " *";
+        color: #dc3545;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="page-title-box d-flex align-items-center justify-content-between">
+                <h4 class="mb-0">
+                    {% if form.instance.pk %}
+                        Edit Property
+                    {% else %}
+                        Add New Property
+                    {% endif %}
+                </h4>
+                <div class="page-title-right">
+                    <a href="{% url 'landlord:dashboard' %}" class="btn btn-outline-secondary">
+                        <i class="ri-arrow-left-line align-middle me-1"></i> Back to Dashboard
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-12">
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                {% endfor %}
+            {% endif %}
+
+            <form method="post" enctype="multipart/form-data" id="property-form">
+                {% csrf_token %}
+                
+                <!-- Property Information Section -->
+                <div class="form-section">
+                    <h4><i class="ri-building-4-line me-2"></i>Property Information</h4>
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="id_name" class="form-label required-field">Property Name</label>
+                            <input type="text" class="form-control" id="id_name" name="name" required 
+                                   value="{{ form.name.value|default:'' }}" placeholder="e.g., Sunset Villas">
+                            {% if form.name.errors %}
+                                <div class="invalid-feedback d-block">{{ form.name.errors.0 }}</div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="col-md-6 mb-3">
+                            <label for="id_location" class="form-label required-field">Location</label>
+                            <input type="text" class="form-control" id="id_location" name="location" required
+                                   value="{{ form.location.value|default:'' }}" placeholder="e.g., Kileleshwa, Nairobi">
+                            {% if form.location.errors %}
+                                <div class="invalid-feedback d-block">{{ form.location.errors.0 }}</div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="id_address" class="form-label required-field">Full Address</label>
+                        <textarea class="form-control" id="id_address" name="address" rows="2" required
+                                 placeholder="Full physical address of the property">{{ form.address.value|default:'' }}</textarea>
+                        {% if form.address.errors %}
+                            <div class="invalid-feedback d-block">{{ form.address.errors.0 }}</div>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-4 mb-3">
+                            <label for="id_rooms" class="form-label">Number of Rooms</label>
+                            <input type="number" class="form-control" id="id_rooms" name="rooms" min="1"
+                                   value="{{ form.rooms.value|default:'1' }}">
+                            {% if form.rooms.errors %}
+                                <div class="invalid-feedback d-block">{{ form.rooms.errors.0 }}</div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="col-md-4 mb-3">
+                            <label for="id_rent" class="form-label required-field">Base Rent (TZS)</label>
+                            <div class="input-group">
+                                <span class="input-group-text">TZS</span>
+                                <input type="number" class="form-control" id="id_rent" name="rent" required
+                                       min="0" step="0.01" value="{{ form.rent.value|default:'' }}">
+                            </div>
+                            {% if form.rent.errors %}
+                                <div class="invalid-feedback d-block">{{ form.rent.errors.0 }}</div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="col-md-4 mb-3">
+                            <label for="id_status" class="form-label required-field">Status</label>
+                            <select class="form-select" id="id_status" name="status" required>
+                                {% for value, label in status_choices %}
+                                    <option value="{{ value }}" {% if form.status.value == value|stringformat:'s' %}selected{% endif %}>
+                                        {{ label }}
+                                    </option>
+                                {% endfor %}
+                            </select>
+                            {% if form.status.errors %}
+                                <div class="invalid-feedback d-block">{{ form.status.errors.0 }}</div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="id_utilities" class="form-label">Included Utilities</label>
+                        <input type="text" class="form-control" id="id_utilities" name="utilities"
+                               value="{{ form.utilities.value|default:'' }}" 
+                               placeholder="e.g., Water, Electricity, Internet">
+                        <small class="form-text text-muted">Separate multiple utilities with commas</small>
+                        {% if form.utilities.errors %}
+                            <div class="invalid-feedback d-block">{{ form.utilities.errors.0 }}</div>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="id_description" class="form-label">Description</label>
+                        <textarea class="form-control" id="id_description" name="description" rows="3"
+                                 placeholder="Detailed description of the property">{{ form.description.value|default:'' }}</textarea>
+                        {% if form.description.errors %}
+                            <div class="invalid-feedback d-block">{{ form.description.errors.0 }}</div>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="id_image" class="form-label">Property Image</label>
+                        <input class="form-control" type="file" id="id_image" name="image" accept="image/*">
+                        {% if form.image.errors %}
+                            <div class="invalid-feedback d-block">{{ form.image.errors.0 }}</div>
+                        {% endif %}
+                    </div>
+                </div>
+                
+                <!-- Units Section -->
+                <div class="form-section">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h4><i class="ri-home-4-line me-2"></i>Units</h4>
+                        <button type="button" class="btn btn-primary add-unit-btn" id="add-unit">
+                            <i class="ri-add-line align-middle me-1"></i> Add Unit
+                        </button>
+                    </div>
+                    
+                    <p class="text-muted">Add one or more units to this property. Each unit can have its own rent amount and features.</p>
+                    
+                    <div id="units-container">
+                        <!-- Units will be added here dynamically -->
+                        <div class="unit-card">
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label required-field">Unit Number/Name</label>
+                                    <input type="text" class="form-control" name="unit_number[]" required
+                                           placeholder="e.g., A1, B2, Ground Floor">
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label required-field">Monthly Rent (TZS)</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text">TZS</span>
+                                        <input type="number" class="form-control" name="unit_rent[]" required
+                                               min="0" step="1000" placeholder="e.g., 150000">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-12 mb-3">
+                                    <div class="form-check form-switch">
+                                        <input class="form-check-input" type="checkbox" id="unit_occupied" 
+                                               name="unit_status[]" value="occupied">
+                                        <label class="form-check-label" for="unit_occupied">Mark as Occupied</label>
+                                    </div>
+                                </div>
+                            </div>
+                            <button type="button" class="btn btn-sm btn-outline-danger remove-unit">
+                                <i class="ri-delete-bin-line align-middle"></i> Remove Unit
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- Template for new units (hidden by default) -->
+                    <template id="unit-template">
+                        <div class="unit-card">
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label required-field">Unit Number/Name</label>
+                                    <input type="text" class="form-control" name="unit_number[]" required
+                                           placeholder="e.g., A1, B2, Ground Floor">
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label required-field">Monthly Rent (TZS)</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text">TZS</span>
+                                        <input type="number" class="form-control" name="unit_rent[]" required
+                                               min="0" step="1000" placeholder="e.g., 150000">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-12 mb-3">
+                                    <div class="form-check form-switch">
+                                        <input class="form-check-input" type="checkbox" 
+                                               name="unit_status[]" value="occupied">
+                                        <label class="form-check-label">Mark as Occupied</label>
+                                    </div>
+                                </div>
+                            </div>
+                            <button type="button" class="btn btn-sm btn-outline-danger remove-unit">
+                                <i class="ri-delete-bin-line align-middle"></i> Remove Unit
+                            </button>
+                        </div>
+                    </template>
+                </div>
+                
+                <div class="d-flex justify-content-between mt-4">
+                    <a href="{% url 'landlord:dashboard' %}" class="btn btn-outline-secondary">
+                        <i class="ri-close-line me-1"></i> Cancel
+                    </a>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="ri-save-line me-1"></i> 
+                        {% if form.instance.pk %}
+                            Update Property
+                        {% else %}
+                            Save Property
+                        {% endif %}
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Add new unit
+    document.getElementById('add-unit').addEventListener('click', function() {
+        const template = document.getElementById('unit-template');
+        const container = document.getElementById('units-container');
+        const clone = template.content.cloneNode(true);
+        
+        // Generate unique IDs for the new unit fields to prevent ID conflicts
+        const unitId = Date.now();
+        const fields = clone.querySelectorAll('[id]');
+        fields.forEach(field => {
+            const oldId = field.id;
+            const newId = `${oldId}-${unitId}`;
+            field.id = newId;
+            
+            // Update the for attribute of the label if it exists
+            const label = field.closest('.mb-3').querySelector('label');
+            if (label && label.getAttribute('for') === oldId) {
+                label.setAttribute('for', newId);
+            }
+        });
+        
+        container.appendChild(clone);
+        updateRemoveButtons();
+    });
+    
+    // Update remove buttons state
+    function updateRemoveButtons() {
+        const removeButtons = document.querySelectorAll('.remove-unit');
+        removeButtons.forEach(button => {
+            // Remove any existing event listeners to prevent duplicates
+            button.replaceWith(button.cloneNode(true));
+            
+            // Add new event listener
+            button.addEventListener('click', function() {
+                const unitCards = document.querySelectorAll('.unit-card');
+                if (unitCards.length > 1) {
+                    this.closest('.unit-card').remove();
+                    updateRemoveButtons();
+                } else {
+                    alert('At least one unit is required.');
+                }
+            });
+        });
+    }
+    
+    // Initialize remove buttons for existing units
+    updateRemoveButtons();
+    
+    // Form validation
+    document.getElementById('property-form').addEventListener('submit', function(event) {
+        let isValid = true;
+        const errorMessages = [];
+        
+        // Check property required fields
+        const requiredFields = this.querySelectorAll('[required]:not([name^="unit_"])');
+        requiredFields.forEach(field => {
+            if (!field.value.trim()) {
+                field.classList.add('is-invalid');
+                isValid = false;
+            } else {
+                field.classList.remove('is-invalid');
+            }
+        });
+        
+        // Check unit required fields
+        const unitCards = document.querySelectorAll('.unit-card');
+        if (unitCards.length === 0) {
+            errorMessages.push('At least one unit is required.');
+            isValid = false;
+        }
+        
+        unitCards.forEach((card, index) => {
+            const unitNumber = card.querySelector('[name="unit_number[]"]');
+            const unitRent = card.querySelector('[name="unit_rent[]"]');
+            
+            if (!unitNumber.value.trim()) {
+                unitNumber.classList.add('is-invalid');
+                errorMessages.push(`Unit #${index + 1}: Unit number is required`);
+                isValid = false;
+            } else {
+                unitNumber.classList.remove('is-invalid');
+            }
+            
+            if (!unitRent.value.trim() || parseFloat(unitRent.value) <= 0) {
+                unitRent.classList.add('is-invalid');
+                errorMessages.push(`Unit #${index + 1}: Valid rent amount is required`);
+                isValid = false;
+            } else {
+                unitRent.classList.remove('is-invalid');
+            }
+        });
+        
+        if (!isValid) {
+            event.preventDefault();
+            const errorMessage = 'Please fix the following errors:\n\n' + errorMessages.join('\n');
+            alert(errorMessage);
+        }
+    });
+    
+    // Real-time validation for required fields
+    document.addEventListener('input', function(event) {
+        const target = event.target;
+        if (target.hasAttribute('required') && target.value.trim()) {
+            target.classList.remove('is-invalid');
+        }
+    });
+    
+    // Numeric input validation for rent fields
+    document.addEventListener('input', function(event) {
+        if (event.target.matches('input[name^="unit_rent"]')) {
+            // Remove any non-numeric characters except decimal point
+            event.target.value = event.target.value.replace(/[^0-9.]/g, '');
+            
+            // Ensure only one decimal point
+            const parts = event.target.value.split('.');
+            if (parts.length > 2) {
+                event.target.value = parts[0] + '.' + parts.slice(1).join('');
+            }
+        }
+    });
+</script>
+{% endblock %}

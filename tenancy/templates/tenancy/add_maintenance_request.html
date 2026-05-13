@@ -1,0 +1,126 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add Maintenance Request - WAPANGAJI</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'tenancy/style.css' %}">
+    <style>
+        .add-maintenance-form {
+            max-width: 500px;
+            margin: 2rem auto;
+            background: var(--bg-primary);
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-md);
+            padding: 2rem;
+        }
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+        .form-group label {
+            font-weight: 600;
+            color: var(--primary-color);
+            margin-bottom: 0.5rem;
+            display: block;
+        }
+        .form-control {
+            width: 100%;
+            padding: 0.75rem;
+            border-radius: var(--radius-md);
+            border: 1px solid var(--border-color);
+            font-size: 1rem;
+            margin-bottom: 0.5rem;
+        }
+        .form-control:focus {
+            border-color: var(--primary-color);
+            outline: none;
+        }
+        .form-actions {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1.5rem;
+        }
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+            color: #fff;
+            border: none;
+            border-radius: var(--radius-md);
+            padding: 0.75rem 2rem;
+            font-size: 1rem;
+            font-weight: 600;
+            box-shadow: var(--shadow-md);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .btn-primary:hover {
+            background: var(--primary-dark);
+            box-shadow: var(--shadow-lg);
+        }
+        .btn-secondary {
+            background: var(--bg-secondary);
+            color: var(--primary-color);
+            border: 1px solid var(--primary-color);
+            border-radius: var(--radius-md);
+            padding: 0.75rem 2rem;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .btn-secondary:hover {
+            background: var(--primary-color);
+            color: #fff;
+        }
+        @media (max-width: 600px) {
+            .add-maintenance-form {
+                padding: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="header-container">
+            <div class="logo">
+                <i class="fas fa-user-tie"></i>
+                <span>WAPANGAJI Tenant</span>
+            </div>
+            <nav class="nav">
+                <a href="{% url 'tenancy:tenant_dashboard' %}" class="nav-link">Dashboard</a>
+                <a href="{% url 'tenancy:maintenance_requests' %}" class="nav-link">Maintenance</a>
+                <a href="{% url 'home:index' %}" class="nav-link">Home</a>
+            </nav>
+        </div>
+    </header>
+    <main class="main-content">
+        <div class="page-header">
+            <h1><i class="fas fa-plus"></i> Add Maintenance Request</h1>
+        </div>
+        <form method="POST" class="add-maintenance-form" enctype="multipart/form-data">
+            {% csrf_token %}
+            <div class="form-group">
+                <label for="title">Request Title <span style="color:var(--danger-color);">*</span></label>
+                <input type="text" id="title" name="title" class="form-control" placeholder="e.g. Leak in kitchen" required>
+            </div>
+            <div class="form-group">
+                <label for="notes">Notes (optional)</label>
+                <textarea id="notes" name="notes" class="form-control" rows="4" placeholder="Describe the issue..."></textarea>
+            </div>
+            <div class="form-group">
+                <label for="photo">Attach Photo (optional)</label>
+                <input type="file" id="photo" name="photo" class="form-control" accept="image/*">
+            </div>
+            <div class="form-actions">
+                <button type="submit" class="btn-primary"><i class="fas fa-paper-plane"></i> Submit Request</button>
+                <a href="{% url 'tenancy:maintenance_requests' %}" class="btn-secondary">Cancel</a>
+            </div>
+        </form>
+    </main>
+    <footer class="footer">
+        <p>&copy; 2025 WAPANGAJI. All Rights Reserved.</p>
+    </footer>
+</body>
+</html>

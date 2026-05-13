@@ -1,0 +1,31 @@
+/* Tenant app theme - applied only to selected tenant pages (not dashboard) */
+.tenant-app-page {
+  background: linear-gradient(180deg, #f7fdf8 0%, #ffffff 50%);
+  padding: 1.25rem 0;
+}
+
+.tenant-app-header {
+  display:flex; align-items:center; gap:12px; margin-bottom:1rem;
+}
+.tenant-app-header .logo {
+  width:54px; height:54px; border-radius:8px; background:linear-gradient(135deg,#16a34a,#059669); display:flex; align-items:center; justify-content:center; color:#fff; font-weight:700; font-size:18px;
+}
+.tenant-app-header .title { font-size:1.15rem; font-weight:700; color:#064E3B }
+.tenant-app-card { border-radius:12px; box-shadow:0 6px 20px rgba(6,95,70,0.08); border:1px solid rgba(6,95,70,0.06) }
+
+/* Buttons that align with tenant style */
+.tenant-app-btn { background: linear-gradient(90deg,#10b981,#059669); color:#fff; border:none; padding:8px 14px; border-radius:10px }
+.tenant-app-outline { border:1px solid rgba(6,95,70,0.12); color:#064E3B }
+
+/* Table styling tweaks */
+.tenant-app-page table thead th { color:#064E3B; background:transparent; border-bottom: 2px solid rgba(6,95,70,0.06) }
+.tenant-app-page .badge { font-weight:700 }
+
+/* Make lists / receipts look modern */
+.tenant-app-page .list-group-item { border-left:4px solid rgba(6,95,70,0.06); border-radius:8px }
+
+/* Small responsive tweaks */
+@media (max-width: 768px) {
+  .tenant-app-header { gap:8px }
+  .tenant-app-header .title { font-size:1rem }
+}

@@ -1,0 +1,367 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ page_title }} - WAPANGAJI</title>
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'tenancy/style.css' %}">
+    <link rel="stylesheet" href="{% static 'css/messages_whatsapp.css' %}">
+    <style>
+        .messages-hero {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 3rem 2rem;
+            border-radius: 1.5rem;
+            margin-bottom: 2rem;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .messages-hero::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grain" width="100" height="100" patternUnits="userSpaceOnUse"><circle cx="25" cy="25" r="1" fill="rgba(255,255,255,0.1)"/><circle cx="75" cy="75" r="1" fill="rgba(255,255,255,0.1)"/><circle cx="50" cy="50" r="1" fill="rgba(255,255,255,0.05)"/></pattern></defs><rect width="100" height="100" fill="url(%23grain)"/></svg>');
+            animation: float 20s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translate(0, 0) rotate(0deg); }
+            33% { transform: translate(30px, -30px) rotate(120deg); }
+            66% { transform: translate(-20px, 20px) rotate(240deg); }
+        }
+
+        .messages-hero h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            position: relative;
+            z-index: 1;
+        }
+
+        .messages-hero p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+            position: relative;
+            z-index: 1;
+        }
+
+        .messages-container {
+            display: grid;
+            grid-template-columns: 1fr 2fr;
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .messages-sidebar {
+            background: white;
+            border-radius: 1.25rem;
+            padding: 1.5rem;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            height: fit-content;
+        }
+
+        .sidebar-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 2px solid #f0f5ff;
+        }
+
+        .sidebar-header h3 {
+            font-size: 1.25rem;
+            color: #1e293b;
+            margin: 0;
+        }
+
+        .compose-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 50px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.9rem;
+        }
+
+        .compose-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
+        }
+
+        .message-preview {
+            padding: 1rem;
+            border-radius: 1rem;
+            margin-bottom: 0.5rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+            position: relative;
+        }
+
+        .message-preview:hover {
+            background: #f8fafc;
+            border-color: #667eea;
+            transform: translateX(5px);
+        }
+
+        .message-preview.unread {
+            background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+            border-color: #f59e0b;
+        }
+
+        .message-preview.unread::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 4px;
+            height: 60%;
+            background: #f59e0b;
+            border-radius: 2px;
+        }
+
+        .preview-sender {
+            font-weight: 600;
+            color: #1e293b;
+            margin-bottom: 0.25rem;
+            font-size: 0.95rem;
+        }
+
+        .preview-subject {
+            font-size: 0.9rem;
+            color: #64748b;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+        }
+
+        .preview-body {
+            font-size: 0.85rem;
+            color: #94a3b8;
+            line-height: 1.4;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .message-preview-link {
+            text-decoration: none;
+            color: inherit;
+            display: block;
+        }
+
+        .message-preview-link:hover .message-preview {
+            background: #f8fafc;
+            border-color: #667eea;
+            transform: translateX(5px);
+        }
+
+        .messages-main {
+            background: white;
+            border-radius: 1.25rem;
+            padding: 2rem;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            min-height: 600px;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 4rem 2rem;
+            color: #64748b;
+        }
+
+        .empty-state i {
+            font-size: 4rem;
+            color: #cbd5e1;
+            margin-bottom: 1.5rem;
+        }
+
+        .empty-state h3 {
+            font-size: 1.5rem;
+            margin-bottom: 0.5rem;
+            color: #1e293b;
+        }
+
+        .empty-state p {
+            font-size: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .empty-compose-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 1rem 2rem;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: all 0.3s ease;
+        }
+
+        .empty-compose-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
+        }
+
+        @media (max-width: 768px) {
+            .messages-container {
+                grid-template-columns: 1fr;
+            }
+
+            .messages-hero h1 {
+                font-size: 2rem;
+            }
+
+            .messages-sidebar {
+                order: 2;
+            }
+
+            .messages-main {
+                order: 1;
+            }
+        }
+    </style>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // No need for JavaScript click handlers since we have proper anchor links
+            console.log('Messages page loaded');
+        });
+    </script>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="header-container">
+            <div class="logo">
+                <i class="fas fa-user-tie"></i>
+                <span>WAPANGAJI Tenant</span>
+            </div>
+            <nav class="nav">
+                <a href="{% url 'tenancy:tenant_dashboard' %}" class="nav-link">Dashboard</a>
+                <a href="{% url 'tenancy:messages_list' %}" class="nav-link active">Messages</a>
+                <a href="/" class="nav-link">Home</a>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <div class="page-header">
+            <a href="{% url 'tenancy:tenant_dashboard' %}" class="back-link">
+                <i class="fas fa-arrow-left"></i> Back to Dashboard
+            </a>
+        </div>
+
+        <!-- Hero Section -->
+        <div class="messages-hero">
+            <h1><i class="fas fa-envelope"></i> Messages</h1>
+            <p>Stay connected with your landlord and property management</p>
+        </div>
+
+        <div class="messages-container">
+            <!-- Sidebar -->
+            <div class="messages-sidebar">
+                <div class="sidebar-header">
+                    <h3>Inbox</h3>
+                    <a href="{% url 'tenancy:send_message' %}" class="compose-btn">
+                        <i class="fas fa-pen"></i> Compose
+                    </a>
+                </div>
+
+                {% if messages %}
+                    {% for message in messages %}
+                        <a href="{% url 'tenancy:message_detail' message.pk %}" class="message-preview-link">
+                            <div class="message-preview {% if not message.read_at %}unread{% endif %}" data-message-id="{{ message.pk }}">
+                                <div class="avatar">{{ message.sender.first_name|slice:":1" }}{{ message.sender.last_name|slice:":1" }}</div>
+                                <div class="preview-content">
+                                    <div class="preview-top">
+                                        <div class="preview-sender">{{ message.sender.first_name }} {{ message.sender.last_name }}</div>
+                                        <div class="preview-time">{{ message.sent_at|date:"M d, H:i" }}</div>
+                                    </div>
+                                    <div class="preview-body">{{ message.body|truncatewords:12 }}</div>
+                                </div>
+                                {% if not message.read_at %}
+                                    <div class="unread-badge">New</div>
+                                {% endif %}
+                            </div>
+                        </a>
+                    {% endfor %}
+                {% else %}
+                    <div class="empty-state">
+                        <i class="fas fa-inbox"></i>
+                        <h3>No Messages Yet</h3>
+                        <p>Your inbox is empty. Start a conversation with your landlord!</p>
+                        <a href="{% url 'tenancy:send_message' %}" class="empty-compose-btn">
+                            <i class="fas fa-paper-plane"></i> Send First Message
+                        </a>
+                    </div>
+                {% endif %}
+            </div>
+
+            <!-- Main Content Area -->
+            <div class="messages-main">
+                {% if messages %}
+                    <div class="chat-header">
+                        <div class="avatar">{{ request.user.first_name|slice:":1" }}{{ request.user.last_name|slice:":1" }}</div>
+                        <div>
+                            <div class="chat-title">Select a message</div>
+                            <div class="chat-sub">Click a conversation from the left to view it here</div>
+                        </div>
+                        <div class="chat-actions">
+                            <a href="{% url 'tenancy:send_message' %}" class="compose-btn"><i class="fas fa-pen"></i></a>
+                        </div>
+                    </div>
+
+                    <div class="chat-body">
+                        <div class="chat-empty">
+                            <h3>Welcome to Messages</h3>
+                            <p>Select a conversation to read it, or start a new message to contact your landlord.</p>
+                            <a href="{% url 'tenancy:send_message' %}" class="empty-compose-btn"><i class="fas fa-paper-plane"></i> New Message</a>
+                        </div>
+                    </div>
+                {% else %}
+                    <div class="chat-header">
+                        <div class="avatar">W</div>
+                        <div>
+                            <div class="chat-title">No conversations yet</div>
+                            <div class="chat-sub">You don't have any messages. Start the conversation!</div>
+                        </div>
+                    </div>
+                    <div class="chat-body">
+                        <div class="chat-empty">
+                            <h3>Start a conversation</h3>
+                            <p>Send your first message to your landlord about maintenance, payments, or tenancy questions.</p>
+                            <a href="{% url 'tenancy:send_message' %}" class="empty-compose-btn"><i class="fas fa-plus"></i> Start Conversation</a>
+                        </div>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <p>&copy; 2025 WAPANGAJI. All Rights Reserved.</p>
+    </footer>
+</body>
+</html>
