@@ -599,6 +599,7 @@ def message_detail(request, pk):
     
     except Exception as e:
         messages.error(request, f'Error loading message: {str(e)}')
+        return redirect('landlord:messages')
 def send_message(request):
     """Allow landlord to send new message to one or more tenants or all tenants"""
     try:
@@ -1135,6 +1136,12 @@ def record_payment(request):
     # Get tenant_id from query parameters if available
     tenant_id = request.GET.get('tenant_id')
     
+    # Prepare context for the template
+    context = {
+        'tenant': None,
+        'current_date': timezone.now().date(),
+    }
+
     # Get the tenant if tenant_id is provided
     tenant = None
     if tenant_id:
@@ -1158,13 +1165,8 @@ def record_payment(request):
         except User.DoesNotExist:
             messages.error(request, 'Invalid tenant selected.')
             return redirect('landlord:payments')
-    
-    # Prepare context for the template
-    context = {
-        'tenant': tenant,
-        'current_date': timezone.now().date(),
-    }
-    
+
+    context['tenant'] = tenant
     if request.method == 'POST':
         try:
             # Get form data
@@ -1294,8 +1296,6 @@ def record_payment(request):
             messages.error(request, f'An unexpected error occurred: {str(e)}')
     
     # For GET requests or if there was an error, show the form
-    return render(request, 'landlord/record_payment.html', context)
-    
     return render(request, 'landlord/record_payment.html', context)
 
 
